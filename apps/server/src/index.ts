@@ -2,10 +2,10 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { getCookie } from "hono/cookie";
-import { db } from "./db";
-import { lucia } from "./lucia";
+import { db } from "./db.js";
+import { lucia } from "./lucia.js";
 import { eq } from "drizzle-orm";
-import { users } from "./schema";
+import { users } from "./schema.js";
 import type { Session, User } from "lucia";
 
 const app = new Hono<{
@@ -18,7 +18,7 @@ const app = new Hono<{
 app.use(
   "/*",
   cors({
-    origin: "http://localhost:5174",
+    origin: ["http://localhost:5174", "http://localhost"],
     credentials: true,
   })
 );

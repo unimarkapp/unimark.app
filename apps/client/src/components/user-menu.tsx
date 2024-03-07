@@ -9,13 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
-import {
-  Github,
-  LayoutDashboard,
-  LifeBuoy,
-  LogOut,
-  UserIcon,
-} from "lucide-react";
+import { Github, LayoutDashboard, LifeBuoy, UserIcon } from "lucide-react";
 import { useProfile } from "@/entities/profile";
 
 export function UserMenu() {
@@ -54,16 +48,6 @@ export function UserMenu() {
           <LifeBuoy className="mr-2 h-4 w-4" />
           <span>Support</span>
         </DropdownMenuItem>
-        {/* <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <button
-            onClick={() => submit(null, { action: "/logout", method: "POST" })}
-            className="flex items-center w-full p-0"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>{t.common.user_menu.logout}</span>
-          </button>
-        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
