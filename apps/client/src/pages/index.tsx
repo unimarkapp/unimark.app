@@ -16,12 +16,18 @@ export function Routing() {
       </div>
     );
 
-  if (isError && error.message === "401") {
+  if (isError && error.status === 401) {
     return (
       <Routes>
         <Route path="/login" element={<Login />}></Route>
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+    );
+  } else if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">{error.message}</p>
+      </div>
     );
   }
 

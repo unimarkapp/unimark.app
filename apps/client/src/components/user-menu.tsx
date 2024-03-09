@@ -13,13 +13,13 @@ import { Github, LayoutDashboard, LifeBuoy, UserIcon } from "lucide-react";
 import { useProfile } from "@/entities/profile";
 
 export function UserMenu() {
-  const { data } = useProfile();
+  const { data: profile } = useProfile();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button className="w-full" variant="outline">
-          {data?.profile.email}
+          {profile?.email}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">

@@ -5,7 +5,9 @@ export function RootLayout() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <Outlet />
+      <div className="flex-1 flex flex-col">
+        <Outlet />
+      </div>
     </div>
   );
 }

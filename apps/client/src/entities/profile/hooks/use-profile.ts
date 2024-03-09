@@ -4,7 +4,7 @@ import { getProfile } from "@/entities/profile";
 export function useProfile() {
   return useQuery({
     queryKey: ["profile"],
-    queryFn: () => getProfile(),
+    queryFn: () => getProfile().then((response) => response.profile),
     staleTime: Infinity,
     retry: false,
   });
