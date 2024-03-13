@@ -18,7 +18,7 @@ interface Props {
   onCloseModal: (open: boolean) => void;
 }
 
-export function UpdateBookmarkModal({ open, onCloseModal }: Props) {
+export function BookmarkModalEdit({ open, onCloseModal }: Props) {
   const [searchParams] = useSearchParams();
   const params = useParams();
   const bookmarkId = searchParams.get("bookmarkId");

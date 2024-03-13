@@ -3,8 +3,8 @@ import { BookmarkCard } from "@/entities/bookmark";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
-import { UpdateBookmarkModal } from "@/features/bookmark/update-bookmark-modal";
-import { DeleteBookmarkModal } from "@/features/bookmark/delete-bookmark-modal";
+import { BookmarkModalEdit } from "@/features/bookmark/bookmark-modal-edit";
+import { BookmarkModalDelete } from "@/features/bookmark/bookmark-modal-delete";
 
 export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,11 +61,11 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
           />
         ))}
       </ul>
-      <UpdateBookmarkModal
+      <BookmarkModalEdit
         open={searchParams.get("modal") === "edit"}
         onCloseModal={closeModal}
       />
-      <DeleteBookmarkModal
+      <BookmarkModalDelete
         open={searchParams.get("modal") === "delete"}
         onCloseModal={closeModal}
       />

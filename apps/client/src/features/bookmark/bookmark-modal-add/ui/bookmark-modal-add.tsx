@@ -14,7 +14,7 @@ import {
 import { ChangeEvent, useState } from "react";
 import { BookmarkForm, schema } from "@/entities/bookmark";
 
-export function AddBookmarkModal() {
+export function BookmarkModalAdd() {
   const [isOpen, setIsOpen] = useState(false);
   const utils = trpc.useUtils();
   const { data: collections } = trpc.collections.list.useQuery();

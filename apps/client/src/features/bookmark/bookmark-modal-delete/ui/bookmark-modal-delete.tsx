@@ -16,7 +16,7 @@ interface Props {
   onCloseModal: (type: "delete") => void;
 }
 
-export function DeleteBookmarkModal({ open, onCloseModal }: Props) {
+export function BookmarkModalDelete({ open, onCloseModal }: Props) {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const collectionId = params.collectionId;
