@@ -1,11 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/entities/profile";
+import { trpc } from "@/shared/trpc";
 
 export function useProfile() {
-  return useQuery({
-    queryKey: ["profile"],
-    queryFn: () => getProfile().then((response) => response.profile),
+  return trpc.profile.get.useQuery(undefined, {
     staleTime: Infinity,
+    gcTime: Infinity,
     retry: false,
   });
 }

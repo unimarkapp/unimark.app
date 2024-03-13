@@ -30,9 +30,9 @@ WORKDIR /app
  
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 honojs
-USER honojs
+RUN adduser --system --uid 1001 trpc
+USER trpc
 
-COPY --from=installer --chown=honojs:nodejs /app .
+COPY --from=installer --chown=trpc:nodejs /app .
  
 CMD ["node", "apps/server/dist/index.js"]
