@@ -52,8 +52,8 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
             cover={bookmark.cover}
             favicon={bookmark.favicon}
             tags={bookmark.tags}
-            onCopyUrl={() => {
-              copyToClipboard(bookmark.url);
+            onCopyUrl={async () => {
+              await copyToClipboard(bookmark.url);
               toast.success("URL copied to clipboard");
             }}
             onEdit={() => openModal("edit", bookmark.id)}
