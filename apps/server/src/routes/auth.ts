@@ -28,8 +28,6 @@ export const authRouter = t.router({
 
       const cookies = lucia.createSessionCookie(session.id);
 
-      console.log("response", ctx.res);
-
       ctx.res.setHeader("Set-Cookie", cookies.serialize());
 
       return { success: true };
