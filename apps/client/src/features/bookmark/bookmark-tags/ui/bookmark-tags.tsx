@@ -122,7 +122,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
                       >
                         <div
                           className={cn([
-                            "w-4 h-4 border rounded flex items-center justify-center shadow-sm",
+                            "w-4 h-4 border rounded flex items-center border-primary/25 justify-center",
                             isChecked
                               ? "bg-foreground text-background border-foreground"
                               : "",
