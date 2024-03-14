@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, exists, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { bookmarks, bookmarksTags } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
@@ -16,33 +16,40 @@ const bookmarkInputSchema = z.object({
 
 export const bookmarksRouter = t.router({
   list: authedProcedure
-    .input(z.object({ collectionId: z.string().optional() }))
+    .input(
+      z.object({
+        collectionId: z.string().optional(),
+        query: z.string().optional(),
+        tag: z.string().optional(),
+      })
+    )
     .query(async ({ ctx: { user }, input }) => {
       await new Promise((resolve) => setTimeout(resolve, 350));
 
       const list = await db.query.bookmarks.findMany({
         where: and(
+          eq(bookmarks.ownerId, user.id),
           ...(input.collectionId
             ? [eq(bookmarks.collectionId, input.collectionId)]
-            : []),
-          eq(bookmarks.ownerId, user.id)
+            : [])
         ),
         with: {
           tags: {
             columns: {},
             with: {
               tag: {
-                columns: { name: true },
+                columns: { id: true, name: true },
               },
             },
           },
         },
+        orderBy: [asc(bookmarks.createdAt)],
       });
 
       return list.map((bookmark) => {
         return {
           ...bookmark,
-          tags: bookmark.tags.map((bt) => bt.tag.name),
+          tags: bookmark.tags.map(({ tag }) => tag),
         };
       });
     }),
@@ -77,6 +84,31 @@ export const bookmarksRouter = t.router({
       const data = await parser(input.url);
 
       return data;
+    }),
+  tag: authedProcedure
+    .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
+    .mutation(async ({ input }) => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+
+      const data = await db
+        .insert(bookmarksTags)
+        .values({ bookmarkId: input.bookmarkId, tagId: input.tagId });
+
+      return data;
+    }),
+  untag: authedProcedure
+    .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
+    .mutation(async ({ input }) => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+
+      await db
+        .delete(bookmarksTags)
+        .where(
+          and(
+            eq(bookmarksTags.bookmarkId, input.bookmarkId),
+            eq(bookmarksTags.tagId, input.tagId)
+          )
+        );
     }),
   delete: authedProcedure
     .input(z.string())

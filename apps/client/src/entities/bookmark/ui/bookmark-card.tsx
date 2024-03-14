@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   FilePenLine,
   Files,
@@ -6,7 +7,6 @@ import {
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,10 +25,10 @@ interface Props {
   favicon: string | null;
   title: string;
   description: string | null;
-  tags: string[];
   onCopyUrl: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  footer?: ReactNode;
 }
 
 export function BookmarkCard({
@@ -38,7 +38,7 @@ export function BookmarkCard({
   favicon,
   title,
   description,
-  tags,
+  footer,
   onCopyUrl,
   onEdit,
   onDelete,
@@ -110,13 +110,7 @@ export function BookmarkCard({
             {description}
           </p>
         </div>
-        <ul className="flex flex-wrap gap-1">
-          {tags.map((tag) => (
-            <li key={tag}>
-              <Badge>{tag}</Badge>
-            </li>
-          ))}
-        </ul>
+        {footer}
       </div>
     </li>
   );

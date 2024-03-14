@@ -102,7 +102,9 @@ export const bookmarksRelations = relations(bookmarks, ({ one, many }) => ({
 }));
 
 export const tags = pgTable("tag", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateId(15)),
   name: text("name").notNull(),
   ownerId: text("owner_id")
     .notNull()

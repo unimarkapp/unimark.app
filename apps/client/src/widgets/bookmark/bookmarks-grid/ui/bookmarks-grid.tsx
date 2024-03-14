@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { BookmarkModalEdit } from "@/features/bookmark/bookmark-modal-edit";
 import { BookmarkModalDelete } from "@/features/bookmark/bookmark-modal-delete";
+import { BookmarkTags } from "@/features/bookmark/bookmark-tags";
 
 export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -51,7 +52,7 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
             description={bookmark.description}
             cover={bookmark.cover}
             favicon={bookmark.favicon}
-            tags={bookmark.tags}
+            footer={<BookmarkTags id={bookmark.id} tags={bookmark.tags} />}
             onCopyUrl={async () => {
               await copyToClipboard(bookmark.url);
               toast.success("URL copied to clipboard");
