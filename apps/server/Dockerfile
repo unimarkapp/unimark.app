@@ -5,7 +5,7 @@ FROM base AS builder
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune server --docker
+RUN turbo prune @bookmark/server --docker
  
 FROM base AS installer
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN pnpm install
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-RUN turbo run build --filter=server...
+RUN turbo run build --filter=@bookmark/server
  
 FROM base AS runner
 WORKDIR /app

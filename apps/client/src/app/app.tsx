@@ -1,3 +1,4 @@
+import type { AppRouter } from "@bookmark/server/src";
 import { Routing } from "@/pages";
 import { BrowserRouter } from "react-router-dom";
 import {
@@ -7,7 +8,6 @@ import {
 } from "@tanstack/react-query";
 import { trpc } from "@/shared/trpc";
 import { TRPCClientError, httpBatchLink } from "@trpc/client";
-import { AppRouter } from "../../../server/src";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast } from "sonner";
 import { Toaster } from "@/shared/ui/sonner";

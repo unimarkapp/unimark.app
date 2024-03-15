@@ -17,6 +17,9 @@ importers:
 
   apps/client:
     dependencies:
+      '@bookmark/server':
+        specifier: workspace:^
+        version: link:../server
       '@hookform/devtools':
         specifier: ^4.3.1
         version: 4.3.1(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)

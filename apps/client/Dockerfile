@@ -5,7 +5,7 @@ FROM base AS builder
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune --scope=client --docker
+RUN turbo prune @bookmark/client --docker
 
 FROM base as installer
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN pnpm install
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-RUN turbo run build --filter=client
+RUN turbo run build --filter=@bookmark/client
 
 # Use the official Caddy image as the base image
 FROM caddy:2.6.4-alpine
