@@ -1,4 +1,4 @@
-import { eq, sql, getTableColumns } from "drizzle-orm";
+import { eq, sql, getTableColumns, desc } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { authedProcedure, t } from "../trpc.js";
 import { bookmarks, collections } from "../db/schema.js";
@@ -15,7 +15,8 @@ export const collectionsRouter = t.router({
       })
       .from(collections)
       .leftJoin(bookmarks, eq(bookmarks.collectionId, collections.id))
-      .groupBy(collections.id);
+      .groupBy(collections.id)
+      .orderBy(desc(sql`count`));
 
     return list;
   }),
