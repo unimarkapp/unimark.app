@@ -4,7 +4,7 @@ import { bookmarks } from "../db/schema.js";
 import { count, eq } from "drizzle-orm";
 
 export const statsRouter = t.router({
-  all: authedProcedure.query(async ({ input, ctx: { user } }) => {
+  all: authedProcedure.query(async ({ ctx: { user } }) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const [bookmarksData] = await db
