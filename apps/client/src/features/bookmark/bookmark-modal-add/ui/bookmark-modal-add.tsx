@@ -11,11 +11,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/dialog";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { BookmarkForm, schema } from "@/entities/bookmark";
+import { useParams, useSearchParams } from "react-router-dom";
 
 export function BookmarkModalAdd() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const params = useParams();
   const utils = trpc.useUtils();
   const { data: collections } = trpc.collections.list.useQuery();
   const form = useForm<Form>({
@@ -43,7 +45,10 @@ export function BookmarkModalAdd() {
     onSuccess() {
       utils.bookmarks.list.invalidate();
       utils.stats.all.invalidate();
-      setIsOpen(false);
+      setSearchParams((prev) => {
+        prev.delete("modal");
+        return prev;
+      });
       parse.reset();
       form.reset();
     },
@@ -61,12 +66,22 @@ export function BookmarkModalAdd() {
     if (!open) {
       parse.reset();
       form.reset();
+    } else {
+      form.setValue("collectionId", params.collection_id || "");
     }
-    setIsOpen(open);
+
+    setSearchParams((prev) => {
+      open ? prev.set("modal", "add-bookmark") : prev.delete("modal");
+
+      return prev;
+    });
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog
+      open={searchParams.get("modal") === "add-bookmark"}
+      onOpenChange={onOpenChange}
+    >
       <DialogTrigger asChild>
         <Button className="w-full">Add Bookmark </Button>
       </DialogTrigger>
