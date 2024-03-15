@@ -10,7 +10,7 @@ import { BookmarkTags } from "@/features/bookmark/bookmark-tags";
 export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const { data, isLoading, isError, error } = trpc.bookmarks.list.useQuery({
     collectionId,

@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function SearchInput({ value, onChangeValue }: Props) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const debouncedSetSearchParams = useDebouncedCallback(setSearchParams, 450);
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
