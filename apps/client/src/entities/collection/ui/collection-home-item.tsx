@@ -2,7 +2,7 @@ import { cn } from "@/shared/lib";
 import { Bookmark, Loader2 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
-export default function CollectionHomeItem({ count }: { count?: number }) {
+export function CollectionHomeItem({ count }: { count?: number }) {
   const location = useLocation();
   const isActive = location.pathname === "/";
 

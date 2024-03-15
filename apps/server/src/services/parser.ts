@@ -89,13 +89,7 @@ function createMetadata(
 }
 
 function getCover(metadata: Record<string, string>) {
-  return (
-    metadata["og:image"] ||
-    metadata["twitter:image"] ||
-    metadata["apple-touch-icon"] ||
-    metadata["icon"] ||
-    metadata["shortcut icon"]
-  );
+  return metadata["og:image"] || metadata["twitter:image"];
 }
 
 function getFavIconImage(metadata: Record<string, string>) {

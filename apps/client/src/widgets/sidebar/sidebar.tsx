@@ -1,5 +1,5 @@
 import { Separator } from "@/shared/ui/separator";
-import { CollectionsList } from "@/entities/collection/ui/collections-list";
+import { CollectionsList } from "@/features/collection/collection-list";
 import { BookmarkModalAdd } from "@/features/bookmark/bookmark-modal-add";
 import { ProfileMenu, useLogout, useProfile } from "@/entities/profile";
 

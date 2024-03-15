@@ -12,7 +12,7 @@ const schema = z.object({
 
 type Form = z.infer<typeof schema>;
 
-export function CreateCollection() {
+export function CollectionCreate() {
   const utils = trpc.useUtils();
   const [isExpanded, setIsExpanded] = useState(false);
 

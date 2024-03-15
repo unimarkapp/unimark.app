@@ -1,8 +1,7 @@
 import { Separator } from "@/shared/ui/separator";
-import CollectionItem from "./collection-item";
 import { trpc } from "@/shared/trpc";
-import { CreateCollection } from "@/features/collection/create-collection";
-import CollectionHomeItem from "./collection-home-item";
+import { CollectionCreate } from "@/features/collection/collection-create";
+import { CollectionHomeItem, CollectionItem } from "@/entities/collection";
 
 export function CollectionsList() {
   const { data: collections } = trpc.collections.list.useQuery();
@@ -22,7 +21,7 @@ export function CollectionsList() {
           count={collection.bookmarksCount}
         />
       ))}
-      <CreateCollection />
+      <CollectionCreate />
     </ul>
   );
 }

@@ -2,7 +2,7 @@ import { cn } from "@/shared/lib";
 import { Folder, FolderOpen } from "lucide-react";
 import { NavLink, useParams } from "react-router-dom";
 
-export default function CollectionItem({
+export function CollectionItem({
   id,
   name,
   count,
