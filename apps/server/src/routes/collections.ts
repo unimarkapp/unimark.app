@@ -1,11 +1,11 @@
-import { eq, sql, getTableColumns, count, desc } from "drizzle-orm";
+import { eq, sql, getTableColumns } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { authedProcedure, t } from "../trpc.js";
 import { bookmarks, collections } from "../db/schema.js";
 import { z } from "zod";
 
 export const collectionsRouter = t.router({
-  list: authedProcedure.query(async ({ ctx: { user } }) => {
+  list: authedProcedure.query(async () => {
     await new Promise((resolve) => setTimeout(resolve, 350));
 
     const list = await db

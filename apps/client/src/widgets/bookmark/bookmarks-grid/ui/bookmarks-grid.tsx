@@ -14,6 +14,8 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
 
   const { data, isLoading, isError, error } = trpc.bookmarks.list.useQuery({
     collectionId,
+    query: searchParams.get("query") ?? undefined,
+    tags: searchParams.getAll("tags") ?? undefined,
   });
 
   function openModal(name: "edit" | "delete", bookmarkId: string) {

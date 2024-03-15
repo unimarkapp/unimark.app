@@ -1,4 +1,4 @@
-import { SearchFilterForm } from "@/features/search/search-filter-form";
+import { CollectionToolbar } from "@/features/collection/collection-toolbar";
 import { trpc } from "@/shared/trpc";
 import { Outlet, useParams } from "react-router-dom";
 
@@ -17,7 +17,7 @@ export function CollectionLayout() {
             <div className="h-4 w-40 rounded-md bg-muted/75 animate-pulse"></div>
           )}
         </h1>
-        <SearchFilterForm />
+        <CollectionToolbar />
       </div>
       <div className="p-8 space-y-8">
         <Outlet />

@@ -1,6 +1,5 @@
 import { cn } from "@/shared/lib";
 import { trpc } from "@/shared/trpc";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import {
   Command,
@@ -12,7 +11,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { Tags, PlusCircle, Check } from "lucide-react";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 interface Props {
   id: string;
@@ -21,6 +20,7 @@ interface Props {
 
 export function BookmarkTags({ id, tags: selected }: Props) {
   const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const utils = trpc.useUtils();
   const collectionId = params.collection_id;
   const [query, setQuery] = useState("");
@@ -160,13 +160,30 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         </PopoverContent>
       </Popover>
       <ul className="flex items-center overflow-x-auto gap-1">
-        {selected.map((tag) => (
-          <li key={tag.id} className="flex">
-            <Badge className="py-1.5" variant="outline">
-              {tag.name}
-            </Badge>
-          </li>
-        ))}
+        {selected.map((tag) => {
+          const isSelected = searchParams.getAll("tags").includes(tag.id);
+
+          return (
+            <li key={tag.id} className="flex">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setSearchParams((prev) => {
+                    isSelected
+                      ? prev.delete("tags", tag.id)
+                      : prev.append("tags", tag.id);
+
+                    return prev;
+                  });
+                }}
+                variant={isSelected ? "default" : "outline"}
+                className="shrink-0 h-[30px]"
+              >
+                {tag.name}
+              </Button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

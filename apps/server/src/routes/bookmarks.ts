@@ -1,4 +1,4 @@
-import { and, asc, eq, exists, inArray } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { bookmarks, bookmarksTags } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
@@ -20,17 +20,35 @@ export const bookmarksRouter = t.router({
       z.object({
         collectionId: z.string().optional(),
         query: z.string().optional(),
-        tag: z.string().optional(),
+        tags: z.array(z.string()).optional(),
       })
     )
     .query(async ({ ctx: { user }, input }) => {
       await new Promise((resolve) => setTimeout(resolve, 350));
+
+      let bookmarksByTags: string[] = [];
+
+      if (input.tags?.length) {
+        const response = await db.query.bookmarksTags.findMany({
+          where: inArray(bookmarksTags.tagId, input.tags),
+        });
+
+        bookmarksByTags = response.map(({ bookmarkId }) => bookmarkId);
+
+        if (!bookmarksByTags.length) {
+          return [];
+        }
+      }
 
       const list = await db.query.bookmarks.findMany({
         where: and(
           eq(bookmarks.ownerId, user.id),
           ...(input.collectionId
             ? [eq(bookmarks.collectionId, input.collectionId)]
+            : []),
+          ...(input.query ? [ilike(bookmarks.title, `%${input.query}%`)] : []),
+          ...(bookmarksByTags?.length
+            ? [inArray(bookmarks.id, bookmarksByTags)]
             : [])
         ),
         with: {
@@ -43,7 +61,7 @@ export const bookmarksRouter = t.router({
             },
           },
         },
-        orderBy: [asc(bookmarks.createdAt)],
+        orderBy: [desc(bookmarks.createdAt)],
       });
 
       return list.map((bookmark) => {
