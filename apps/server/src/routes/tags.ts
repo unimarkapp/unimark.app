@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authedProcedure, t } from "../trpc.js";
 import { db } from "../db/index.js";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { bookmarksTags, tags } from "../db/schema.js";
 
 const tagNameSchema = z
@@ -47,5 +47,13 @@ export const tagsRouter = t.router({
         .values({ tagId: tag.id, bookmarkId: input.bookmarkId });
 
       return tag;
+    }),
+  delete: authedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx: { user }, input }) => {
+      await db.delete(bookmarksTags).where(eq(bookmarksTags.tagId, input));
+      await db
+        .delete(tags)
+        .where(and(eq(tags.id, input), eq(tags.ownerId, user.id)));
     }),
 });
