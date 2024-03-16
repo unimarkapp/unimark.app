@@ -47,7 +47,7 @@ export function ProfileMenu({
           <DropdownMenuItem asChild>
             <Link to="/settings">
               <UserIcon className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>Settings</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
