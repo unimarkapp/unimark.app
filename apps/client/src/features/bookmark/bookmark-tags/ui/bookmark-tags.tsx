@@ -35,15 +35,22 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         }
       });
 
-      utils.bookmarks.list.setData({ collectionId }, (data) => {
-        if (data) {
-          return data.map((bookmark) =>
-            bookmark.id === id
-              ? { ...bookmark, tags: [...bookmark.tags, tag] }
-              : bookmark
-          );
+      utils.bookmarks.list.setData(
+        {
+          collectionId,
+          query: searchParams.get("query") ?? undefined,
+          tags: searchParams.getAll("tags") ?? undefined,
+        },
+        (data) => {
+          if (data) {
+            return data.map((bookmark) =>
+              bookmark.id === id
+                ? { ...bookmark, tags: [...bookmark.tags, tag] }
+                : bookmark
+            );
+          }
         }
-      });
+      );
 
       setQuery("");
     },
