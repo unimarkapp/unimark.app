@@ -6,7 +6,11 @@ import { createContext } from "./contexts/create-context.js";
 createHTTPServer({
   router: appRouter,
   middleware: cors({
-    origin: ["http://localhost:5174", "http://localhost:5173"],
+    origin: [
+      "http://localhost:5174",
+      "http://localhost:5173",
+      "http://localhost",
+    ],
     credentials: true,
   }),
   createContext,

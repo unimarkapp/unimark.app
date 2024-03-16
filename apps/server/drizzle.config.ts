@@ -5,9 +5,9 @@ export default {
   out: "./drizzle",
   driver: "pg",
   dbCredentials: {
-    user: "postgres",
-    host: "localhost",
-    database: "bookmark",
-    password: "postgres",
+    database: process.env.POSTGRES_DB,
+    host: process.env.POSTGRES_HOST,
+    user: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
   },
 } satisfies Config;
