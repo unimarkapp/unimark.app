@@ -6,8 +6,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "NODE_ENV=production NODE_NO_WARNINGS=1 node dist/index.js",
-    "generate": "drizzle-kit generate:pg",
-    "push": "drizzle-kit push:pg",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:push": "drizzle-kit push:pg",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {

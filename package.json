@@ -4,6 +4,8 @@
   "scripts": {
     "build": "dotenv -e .env -- turbo build",
     "dev": "dotenv -e .env.development -- turbo dev",
+    "db:push": "dotenv -e .env.development -- turbo run db:push",
+    "db:generate": "dotenv -e .env.development -- turbo run db:generate",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
