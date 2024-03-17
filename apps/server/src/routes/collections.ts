@@ -1,11 +1,12 @@
-import { eq, sql, getTableColumns, desc } from "drizzle-orm";
+import { eq, sql, getTableColumns, desc, and } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { authedProcedure, t } from "../trpc.js";
 import { bookmarks, collections } from "../db/schema.js";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const collectionsRouter = t.router({
-  list: authedProcedure.query(async () => {
+  list: authedProcedure.query(async ({ ctx: { user } }) => {
     await new Promise((resolve) => setTimeout(resolve, 350));
 
     const list = await db
@@ -14,6 +15,7 @@ export const collectionsRouter = t.router({
         bookmarksCount: sql<number>`count(${bookmarks.id})`,
       })
       .from(collections)
+      .where(eq(collections.ownerId, user.id))
       .leftJoin(bookmarks, eq(bookmarks.collectionId, collections.id))
       .groupBy(collections.id)
       .orderBy(desc(sql`count`));
@@ -29,5 +31,16 @@ export const collectionsRouter = t.router({
         .returning();
 
       return collection;
+    }),
+  delete: authedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx: { user }, input }) => {
+      await db
+        .delete(collections)
+        .where(
+          and(eq(collections.id, input), eq(collections.ownerId, user.id))
+        );
+
+      return input;
     }),
 });
