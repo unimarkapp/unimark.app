@@ -97,7 +97,7 @@ export function BookmarkCard({
               <ImageOff className="text-muted-foreground" />
             )}
           </a>
-          <p className="font-medium text-lg">
+          <p className="font-medium line-clamp-2 text-lg">
             {favicon ? (
               <img
                 src={favicon}
