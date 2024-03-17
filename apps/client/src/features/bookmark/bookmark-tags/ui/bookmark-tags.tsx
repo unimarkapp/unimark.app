@@ -43,6 +43,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         },
         (data) => {
           if (data) {
+            console.log("bookmarks", data);
             return data.map((bookmark) =>
               bookmark.id === id
                 ? { ...bookmark, tags: [...bookmark.tags, tag] }
@@ -62,31 +63,45 @@ export function BookmarkTags({ id, tags: selected }: Props) {
     const isChecked = selected.some((item) => item.id === tag.id);
 
     if (isChecked) {
-      utils.bookmarks.list.setData({ collectionId }, (data) => {
-        if (data) {
-          return data.map((bookmark) =>
-            bookmark.id === id
-              ? {
-                  ...bookmark,
-                  tags: bookmark.tags.filter((item) => item.id !== tag.id),
-                }
-              : bookmark
-          );
+      utils.bookmarks.list.setData(
+        {
+          collectionId,
+          query: searchParams.get("query") ?? undefined,
+          tags: searchParams.getAll("tags") ?? undefined,
+        },
+        (data) => {
+          if (data) {
+            return data.map((bookmark) =>
+              bookmark.id === id
+                ? {
+                    ...bookmark,
+                    tags: bookmark.tags.filter((item) => item.id !== tag.id),
+                  }
+                : bookmark
+            );
+          }
         }
-      });
+      );
       unassign.mutate({ bookmarkId: id, tagId: tag.id });
       return;
     }
 
-    utils.bookmarks.list.setData({ collectionId }, (data) => {
-      if (data) {
-        return data.map((bookmark) =>
-          bookmark.id === id
-            ? { ...bookmark, tags: [...bookmark.tags, tag] }
-            : bookmark
-        );
+    utils.bookmarks.list.setData(
+      {
+        collectionId,
+        query: searchParams.get("query") ?? undefined,
+        tags: searchParams.getAll("tags") ?? undefined,
+      },
+      (data) => {
+        if (data) {
+          return data.map((bookmark) =>
+            bookmark.id === id
+              ? { ...bookmark, tags: [...bookmark.tags, tag] }
+              : bookmark
+          );
+        }
       }
-    });
+    );
     assign.mutate({ bookmarkId: id, tagId: tag.id });
   }
 
