@@ -1,9 +1,10 @@
 import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { bookmarks, bookmarksTags } from "../db/schema.js";
+import { bookmarks, bookmarksTags, collections } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
 import { parser } from "../services/parser.js";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 const bookmarkInputSchema = z.object({
   url: z.string(),
@@ -27,6 +28,22 @@ export const bookmarksRouter = t.router({
       await new Promise((resolve) => setTimeout(resolve, 350));
 
       let bookmarksByTags: string[] = [];
+
+      if (input.collectionId) {
+        const collection = await db.query.collections.findFirst({
+          where: and(
+            eq(collections.ownerId, user.id),
+            eq(collections.id, input.collectionId)
+          ),
+        });
+
+        if (!collection) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Collection not found.",
+          });
+        }
+      }
 
       if (input.tags?.length) {
         const response = await db.query.bookmarksTags.findMany({
@@ -132,8 +149,6 @@ export const bookmarksRouter = t.router({
     .input(z.string())
     .mutation(async ({ ctx: { user }, input }) => {
       await new Promise((resolve) => setTimeout(resolve, 350));
-
-      await db.delete(bookmarksTags).where(eq(bookmarksTags.bookmarkId, input));
 
       await db
         .delete(bookmarks)

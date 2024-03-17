@@ -41,7 +41,7 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
 
   return (
     <div>
-      {isError && <div>{error.data?.code}</div>}
+      {isError && <div>{error.message}</div>}
       {isLoading && <Loading />}
       {data?.length === 0 && <Empty />}
       <ul className="grid grid-cols-4 gap-4">
