@@ -3,7 +3,6 @@ import { db } from "../db/index.js";
 import { authedProcedure, t } from "../trpc.js";
 import { bookmarks, collections } from "../db/schema.js";
 import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 
 export const collectionsRouter = t.router({
   list: authedProcedure.query(async ({ ctx: { user } }) => {
