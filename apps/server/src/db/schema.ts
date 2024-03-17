@@ -72,7 +72,7 @@ export const bookmarks = pgTable("bookmark", {
     .references(() => users.id),
   collectionId: text("collection_id")
     .notNull()
-    .references(() => collections.id),
+    .references(() => collections.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", {
     withTimezone: true,
     mode: "date",
@@ -116,10 +116,10 @@ export const bookmarksTags = pgTable(
   {
     bookmarkId: text("bookmark_id")
       .notNull()
-      .references(() => bookmarks.id),
+      .references(() => bookmarks.id, { onDelete: "cascade" }),
     tagId: text("tag_id")
       .notNull()
-      .references(() => tags.id),
+      .references(() => tags.id, { onDelete: "cascade" }),
   },
   (t) => ({ pk: primaryKey({ columns: [t.bookmarkId, t.tagId] }) })
 );
