@@ -28,6 +28,7 @@ export function CollectionModalDelete({ open, onCloseModal }: Props) {
     onSuccess: async () => {
       utils.collections.list.invalidate();
       utils.stats.all.invalidate();
+      utils.bookmarks.list.invalidate();
 
       onCloseModal();
 
