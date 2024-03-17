@@ -27,6 +27,7 @@ export function CollectionModalDelete({ open, onCloseModal }: Props) {
   const remove = trpc.collections.delete.useMutation({
     onSuccess: async () => {
       utils.collections.list.invalidate();
+      utils.stats.all.invalidate();
 
       onCloseModal();
 

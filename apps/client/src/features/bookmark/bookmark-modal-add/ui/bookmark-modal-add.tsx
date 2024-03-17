@@ -44,6 +44,7 @@ export function BookmarkModalAdd() {
   const create = trpc.bookmarks.create.useMutation({
     onSuccess() {
       utils.bookmarks.list.invalidate();
+      utils.collections.list.invalidate();
       utils.stats.all.invalidate();
       setSearchParams((prev) => {
         prev.delete("modal");
