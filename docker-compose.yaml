@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     volumes:
-      - client_data:/var/www/wishubapp.space/html/
+      - ./client:/apps/client/
 
   server:
     build:
@@ -37,6 +37,3 @@ services:
       - 127.0.0.1:5432:5432
     volumes:
       - ./.postgres:/var/lib/postgresql/data
-
-volumes:
-  client_data:

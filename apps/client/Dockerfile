@@ -32,4 +32,4 @@ FROM caddy:2.6.4-alpine
 WORKDIR /usr/share/caddy
   
 # Copy the built Vite React app from the previous stage to the Caddy web root
-COPY --from=installer /app/apps/client/dist .
+COPY --from=installer /app/apps/client/dist /var/www/wishubapp.space/html/
