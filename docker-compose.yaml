@@ -10,11 +10,8 @@ services:
     restart: always
     env_file:
       - .env
-    ports:
-      - 80:80
-      - 443:443
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - client_data: /var/www/wishubapp.space/html/
 
   server:
     build:
@@ -40,3 +37,6 @@ services:
       - 127.0.0.1:5432:5432
     volumes:
       - ./.postgres:/var/lib/postgresql/data
+
+volumes:
+  client_data:
