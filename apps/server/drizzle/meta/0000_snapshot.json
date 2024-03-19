@@ -1,11 +1,11 @@
 {
-  "id": "b19635e5-713f-4280-a6b1-2fb18974849f",
+  "id": "74684abc-b638-4594-93f5-5c107c8df399",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "bookmarks": {
-      "name": "bookmarks",
+    "bookmark": {
+      "name": "bookmark",
       "schema": "",
       "columns": {
         "id": {
@@ -14,15 +14,97 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "title": {
+          "name": "title",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover": {
+          "name": "cover",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "favicon": {
+          "name": "favicon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collection_id": {
+          "name": "collection_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "bookmark_owner_id_user_id_fk": {
+          "name": "bookmark_owner_id_user_id_fk",
+          "tableFrom": "bookmark",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "bookmark_collection_id_collection_id_fk": {
+          "name": "bookmark_collection_id_collection_id_fk",
+          "tableFrom": "bookmark",
+          "tableTo": "collection",
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -45,34 +127,42 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "bookmarks_tags_bookmark_id_bookmarks_id_fk": {
-          "name": "bookmarks_tags_bookmark_id_bookmarks_id_fk",
+        "bookmarks_tags_bookmark_id_bookmark_id_fk": {
+          "name": "bookmarks_tags_bookmark_id_bookmark_id_fk",
           "tableFrom": "bookmarks_tags",
-          "tableTo": "bookmarks",
+          "tableTo": "bookmark",
           "columnsFrom": [
             "bookmark_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "bookmarks_tags_tag_id_tags_id_fk": {
-          "name": "bookmarks_tags_tag_id_tags_id_fk",
+        "bookmarks_tags_tag_id_tag_id_fk": {
+          "name": "bookmarks_tags_tag_id_tag_id_fk",
           "tableFrom": "bookmarks_tags",
-          "tableTo": "tags",
+          "tableTo": "tag",
           "columnsFrom": [
             "tag_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "bookmarks_tags_bookmark_id_tag_id_pk": {
+          "name": "bookmarks_tags_bookmark_id_tag_id_pk",
+          "columns": [
+            "bookmark_id",
+            "tag_id"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "collection": {
@@ -178,8 +268,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "tags": {
-      "name": "tags",
+    "tag": {
+      "name": "tag",
       "schema": "",
       "columns": {
         "id": {
@@ -193,10 +283,30 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "tag_owner_id_user_id_fk": {
+          "name": "tag_owner_id_user_id_fk",
+          "tableFrom": "tag",
+          "tableTo": "user",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

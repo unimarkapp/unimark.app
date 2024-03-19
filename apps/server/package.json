@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "NODE_ENV=production NODE_NO_WARNINGS=1 node dist/index.js",
+    "start": "pnpm db:generate && pnpm db:migrate && NODE_ENV=production NODE_NO_WARNINGS=1 node dist/index.js",
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
+    "db:migrate": "tsx src/migrate.ts",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {

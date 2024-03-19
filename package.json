@@ -6,6 +6,7 @@
     "dev": "dotenv -e .env.development -- turbo dev",
     "db:push": "dotenv -e .env.development -- turbo run db:push",
     "db:generate": "dotenv -e .env.development -- turbo run db:generate",
+    "db:migrate": "dotenv -e .env.development -- turbo run db:migrate",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
