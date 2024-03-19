@@ -24,7 +24,7 @@ export default function App() {
   const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
-        url: "http://localhost:3000",
+        url: import.meta.env.API_URL,
         fetch: (input, init) =>
           fetch(input, { ...init, credentials: "include" }),
       }),

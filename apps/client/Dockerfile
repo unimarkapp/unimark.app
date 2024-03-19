@@ -25,17 +25,10 @@ COPY turbo.json turbo.json
 
 RUN turbo run build --filter=@bookmark/client
 
-# Use the official Caddy image as the base image
-FROM caddy:2.6.4-alpine
+FROM base as final
   
 # Set the working directory inside the container
-WORKDIR /usr/share/caddy
+WORKDIR /dist
   
-# Copy the built Vite React app from the previous stage to the Caddy web root
+# Copy the built Vite React app from the previous stage to the container root
 COPY --from=installer /app/apps/client/dist .
-  
-# Expose port 80 for HTTP traffic
-EXPOSE 80
-  
-# Set the command to start Caddy and serve the Vite React app
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
