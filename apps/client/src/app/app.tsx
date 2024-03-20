@@ -24,7 +24,7 @@ export default function App() {
   const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
-        url: import.meta.env.API_URL,
+        url: import.meta.env.VITE_API_URL,
         fetch: (input, init) =>
           fetch(input, { ...init, credentials: "include" }),
       }),
