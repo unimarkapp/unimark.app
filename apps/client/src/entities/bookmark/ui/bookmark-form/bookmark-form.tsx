@@ -38,27 +38,6 @@ export function BookmarkForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="url">URL</Label>
-        <Controller
-          name="url"
-          control={control}
-          defaultValue=""
-          disabled={isFetching}
-          render={({ field }) => (
-            <Input
-              {...field}
-              id="url"
-              placeholder="Enter URL"
-              onChange={(e) => {
-                field.onChange(e);
-                onUrlChange?.(e);
-              }}
-            />
-          )}
-        />
-        {errors.url && <p className="text-red-500">{errors.url.message}</p>}
-      </div>
       <div className="grid grid-cols-2 relative gap-4">
         <Controller
           control={control}
@@ -77,8 +56,29 @@ export function BookmarkForm({
             )
           }
         />
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="space-y-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="url">URL</Label>
+            <Controller
+              name="url"
+              control={control}
+              defaultValue=""
+              disabled={isFetching}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="url"
+                  placeholder="Enter URL"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    onUrlChange?.(e);
+                  }}
+                />
+              )}
+            />
+            {errors.url && <p className="text-red-500">{errors.url.message}</p>}
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
             <Input
               {...register("title")}
@@ -86,7 +86,7 @@ export function BookmarkForm({
               placeholder="Enter bookmark name"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="description">Description</Label>
             <Textarea
               {...register("description")}
@@ -95,7 +95,7 @@ export function BookmarkForm({
               placeholder="Enter bookmark description"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label htmlFor="collection">Collection</Label>
             <Controller
               control={control}
