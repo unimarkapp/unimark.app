@@ -52,13 +52,17 @@ export function ProfileMenu({
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <Github className="mr-2 h-4 w-4" />
-          <span>GitHub</span>
+        <DropdownMenuItem asChild>
+          <a href="https://github.com/unimarkapp/unimark.app" target="_blank">
+            <Github className="mr-2 h-4 w-4" />
+            <span>GitHub</span>
+          </a>
         </DropdownMenuItem>
-        <DropdownMenuItem disabled>
-          <LifeBuoy className="mr-2 h-4 w-4" />
-          <span>Support</span>
+        <DropdownMenuItem asChild>
+          <a href="mailto:hello@unimark.app">
+            <LifeBuoy className="mr-2 h-4 w-4" />
+            <span>Support</span>
+          </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild onClick={onLogout}>
