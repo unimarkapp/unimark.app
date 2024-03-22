@@ -5,9 +5,9 @@ FROM base AS builder
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune @bookmark/server --docker
+RUN turbo prune @unimark/server --docker
  
-FROM base AS installer
+FROM base AS runner
 WORKDIR /app
 
 RUN npm install -g pnpm
@@ -23,16 +23,13 @@ RUN pnpm install
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-RUN turbo run build --filter=@bookmark/server
- 
-FROM base AS runner
-WORKDIR /app
+RUN turbo run build --filter=@unimark/server
  
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 trpc
 USER trpc
 
-COPY --from=installer --chown=trpc:nodejs /app .
+WORKDIR /app/apps/server
  
-CMD ["node", "apps/server/dist/index.js"]
+CMD ["pnpm", "run", "start"]

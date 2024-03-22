@@ -1,5 +1,5 @@
 {
-  "name": "bookmark",
+  "name": "unimark",
   "private": true,
   "scripts": {
     "build": "dotenv -e .env -- turbo build",

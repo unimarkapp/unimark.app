@@ -1,21 +1,11 @@
 version: "3.7"
 
 services:
-  client:
-    build:
-      context: .
-      dockerfile: ./apps/client/Dockerfile
-    container_name: bookmark-client
-    hostname: client
-    restart: always
-    env_file:
-      - .env
-
   server:
     build:
       context: .
       dockerfile: ./apps/server/Dockerfile
-    container_name: bookmark-server
+    container_name: unimark-server
     hostname: server
     restart: always
     env_file:
@@ -28,7 +18,7 @@ services:
   database:
     image: postgres:16.1-alpine
     restart: always
-    container_name: bookmark-database
+    container_name: unimark-database
     env_file:
       - .env
     ports:

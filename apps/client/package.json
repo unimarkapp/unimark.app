@@ -1,5 +1,5 @@
 {
-  "name": "@bookmark/client",
+  "name": "@unimark/client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bookmark/server": "workspace:^",
+    "@unimark/server": "workspace:^",
     "@hookform/devtools": "^4.3.1",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-alert-dialog": "^1.0.5",

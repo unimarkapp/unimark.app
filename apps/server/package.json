@@ -1,5 +1,5 @@
 {
-  "name": "@bookmark/server",
+  "name": "@unimark/server",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

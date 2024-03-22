@@ -20,9 +20,6 @@ importers:
 
   apps/client:
     dependencies:
-      '@bookmark/server':
-        specifier: workspace:^
-        version: link:../server
       '@hookform/devtools':
         specifier: ^4.3.1
         version: 4.3.1(@types/react@18.2.61)(react-dom@18.2.0)(react@18.2.0)
@@ -77,6 +74,9 @@ importers:
       '@uidotdev/usehooks':
         specifier: ^2.4.1
         version: 2.4.1(react-dom@18.2.0)(react@18.2.0)
+      '@unimark/server':
+        specifier: workspace:^
+        version: link:../server
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
