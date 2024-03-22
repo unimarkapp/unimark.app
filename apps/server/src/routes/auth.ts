@@ -10,7 +10,7 @@ import { generateId } from "lucia";
 
 export const authRouter = t.router({
   login: t.procedure
-    .input(z.object({ email: z.string() }))
+    .input(z.object({ email: z.string(), password: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const profile = await db.query.users.findFirst({
         where: eq(users.email, input.email),
@@ -20,7 +20,10 @@ export const authRouter = t.router({
       });
 
       if (!profile) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid credentials.",
+        });
       }
 
       const session = await lucia.createSession(profile.id, {});

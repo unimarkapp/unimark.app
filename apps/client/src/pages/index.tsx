@@ -1,6 +1,6 @@
 import Home from "./home";
 import Login from "./login";
-import Confirm from "./confirm";
+// import Confirm from "./confirm";
 import { RootLayout } from "@/layouts/root";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ import Settings from "./settings";
 import Register from "./register";
 import Collection from "./collection";
 import { CollectionLayout } from "@/layouts/collection";
+import { AuthLayout } from "@/layouts/auth";
 
 export function Routing() {
   const { data, isError, error } = useProfile();
@@ -19,9 +20,11 @@ export function Routing() {
     if (error.data?.httpStatus === 401) {
       return (
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/" element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Route>
         </Routes>
       );
     } else {
@@ -29,14 +32,15 @@ export function Routing() {
     }
   }
 
-  if (!data?.isEmailVerified) {
-    return (
-      <Routes>
-        <Route path="/confirm" element={<Confirm />} />
-        <Route path="*" element={<Navigate to="/confirm" />} />
-      </Routes>
-    );
-  }
+  // TODO: Uncomment this when email verification is implemented
+  // if (!data?.isEmailVerified) {
+  //   return (
+  //     <Routes>
+  //       <Route path="/confirm" element={<Confirm />} />
+  //       <Route path="*" element={<Navigate to="/confirm" />} />
+  //     </Routes>
+  //   );
+  // }
 
   return (
     <Routes>
