@@ -12,7 +12,6 @@ export const authRouter = t.router({
   login: t.procedure
     .input(z.object({ email: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
       const profile = await db.query.users.findFirst({
         where: eq(users.email, input.email),
         columns: {
@@ -44,8 +43,6 @@ export const authRouter = t.router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
         const hashedPassword = await new Argon2id().hash(input.password);
         const userId = generateId(15);
 

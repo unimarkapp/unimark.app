@@ -6,8 +6,6 @@ import { z } from "zod";
 
 export const collectionsRouter = t.router({
   list: authedProcedure.query(async ({ ctx: { user } }) => {
-    await new Promise((resolve) => setTimeout(resolve, 350));
-
     const list = await db
       .select({
         ...getTableColumns(collections),

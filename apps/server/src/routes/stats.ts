@@ -5,8 +5,6 @@ import { count, eq } from "drizzle-orm";
 
 export const statsRouter = t.router({
   all: authedProcedure.query(async ({ ctx: { user } }) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
     const [bookmarksData] = await db
       .select({ count: count(bookmarks) })
       .from(bookmarks)

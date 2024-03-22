@@ -25,8 +25,6 @@ export const bookmarksRouter = t.router({
       })
     )
     .query(async ({ ctx: { user }, input }) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
       let bookmarksByTags: string[] = [];
 
       if (input.collectionId) {
@@ -91,8 +89,6 @@ export const bookmarksRouter = t.router({
   create: authedProcedure
     .input(bookmarkInputSchema)
     .mutation(async ({ ctx: { user }, input }) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
       const [bookmark] = await db
         .insert(bookmarks)
         .values({ ...input, ownerId: user.id })
@@ -103,8 +99,6 @@ export const bookmarksRouter = t.router({
   update: authedProcedure
     .input(bookmarkInputSchema.extend({ id: z.string() }))
     .mutation(async ({ input }) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
       const [bookmark] = await db
         .update(bookmarks)
         .set(input)
@@ -123,8 +117,6 @@ export const bookmarksRouter = t.router({
   tag: authedProcedure
     .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
     .mutation(async ({ input }) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
       const data = await db
         .insert(bookmarksTags)
         .values({ bookmarkId: input.bookmarkId, tagId: input.tagId });
@@ -134,8 +126,6 @@ export const bookmarksRouter = t.router({
   untag: authedProcedure
     .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
     .mutation(async ({ input }) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
       await db
         .delete(bookmarksTags)
         .where(
@@ -148,8 +138,6 @@ export const bookmarksRouter = t.router({
   delete: authedProcedure
     .input(z.string())
     .mutation(async ({ ctx: { user }, input }) => {
-      await new Promise((resolve) => setTimeout(resolve, 350));
-
       await db
         .delete(bookmarks)
         .where(and(eq(bookmarks.id, input), eq(bookmarks.ownerId, user.id)));
