@@ -1,4 +1,4 @@
-import type { AppRouter } from "@bookmark/server/src";
+import type { AppRouter } from "@unimark/server/src";
 import { Routing } from "@/pages";
 import { BrowserRouter } from "react-router-dom";
 import {
