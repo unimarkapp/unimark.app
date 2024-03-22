@@ -5,10 +5,13 @@ import { users, sessions } from "../db/schema.js";
 
 const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
 
+const isProd = process.env.NODE_ENV === "production";
+
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
-      secure: process.env.NODE_ENV === "production",
+      domain: isProd ? process.env.DOMAIN : "localhost",
+      secure: isProd,
     },
   },
   getUserAttributes(attributes) {
