@@ -29,8 +29,8 @@ export function AuthLayout() {
               y2="208.672"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stop-color="#00C2FF" />
-              <stop offset="1" stop-color="red" />
+              <stop stopColor="#00C2FF" />
+              <stop offset="1" stopColor="red" />
             </linearGradient>
             <linearGradient
               id="b"
@@ -41,7 +41,7 @@ export function AuthLayout() {
               gradientUnits="userSpaceOnUse"
             >
               <stop />
-              <stop offset="1" stop-color="#742929" />
+              <stop offset="1" stopColor="#742929" />
             </linearGradient>
           </defs>
         </svg>

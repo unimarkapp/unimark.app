@@ -21,6 +21,7 @@ export function Routing() {
       return (
         <Routes>
           <Route path="/" element={<AuthLayout />}>
+            <Route index element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/login" />} />
