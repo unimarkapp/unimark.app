@@ -55,6 +55,7 @@ export default function Login() {
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
+            type="email"
             {...register("email")}
             placeholder="Enter your email"
           />
@@ -72,6 +73,7 @@ export default function Login() {
           </div>
           <Input
             id="password"
+            type="password"
             {...register("password")}
             placeholder="Enter your password"
           />

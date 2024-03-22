@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authedProcedure, t } from "../trpc.js";
 import { db } from "../db/index.js";
-import { users } from "../db/schema.js";
+import { bookmarks, collections, users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { lucia } from "../auth/index.js";
 import { TRPCError } from "@trpc/server";
@@ -11,15 +11,24 @@ import { generateId } from "lucia";
 export const authRouter = t.router({
   login: t.procedure
     .input(z.object({ email: z.string(), password: z.string() }))
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input: { email, password }, ctx }) => {
       const profile = await db.query.users.findFirst({
-        where: eq(users.email, input.email),
-        columns: {
-          password: false,
-        },
+        where: eq(users.email, email),
       });
 
       if (!profile) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid credentials.",
+        });
+      }
+
+      const isPasswordMatched = await new Argon2id().verify(
+        profile.password,
+        password
+      );
+
+      if (!isPasswordMatched) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Invalid credentials.",
@@ -51,8 +60,35 @@ export const authRouter = t.router({
 
         const [user] = await db
           .insert(users)
-          .values({ id: userId, ...input, password: hashedPassword })
+          // TODO: Remove isEmailVerified when email verification is implemented
+          .values({
+            id: userId,
+            ...input,
+            password: hashedPassword,
+            isEmailVerified: true,
+          })
           .returning();
+
+        // Add default collection
+        const [collection] = await db
+          .insert(collections)
+          .values({
+            ownerId: user.id,
+            name: "Websites",
+          })
+          .returning();
+
+        // Add default bookmark
+        await db.insert(bookmarks).values({
+          title: "Unimark",
+          url: "https://unimark.app",
+          collectionId: collection.id,
+          ownerId: user.id,
+          cover: "https://unimark.app/og-image.png",
+          favicon: "https://unimark.app/favicon.svg",
+          description:
+            "Unimark makes it easy to manage all of your bookmarks. Use our cloud or as a self-hosted and own your data.",
+        });
 
         const session = await lucia.createSession(user.id, {});
 
@@ -71,6 +107,7 @@ export const authRouter = t.router({
   confirm: authedProcedure
     .input(z.object({ code: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      // TODO: Implement email verification
       if (input.code !== "1234") {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid code" });
       }
@@ -83,6 +120,10 @@ export const authRouter = t.router({
       return { success: true };
     }),
   logout: t.procedure.mutation(async ({ ctx }) => {
+    if (ctx.session) {
+      await lucia.invalidateSession(ctx.session.id);
+    }
+
     const cookies = lucia.createBlankSessionCookie();
 
     ctx.res.setHeader("Set-Cookie", cookies.serialize());
