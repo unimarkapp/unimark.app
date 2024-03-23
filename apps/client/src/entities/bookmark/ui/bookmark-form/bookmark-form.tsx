@@ -38,7 +38,7 @@ export function BookmarkForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-      <div className="grid grid-cols-2 relative gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 relative gap-4">
         <Controller
           control={control}
           name="cover"
