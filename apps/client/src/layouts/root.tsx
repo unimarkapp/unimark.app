@@ -8,7 +8,7 @@ export function RootLayout() {
       <ThemeListener />
       <div className="flex min-h-screen">
         <Sidebar />
-        <div className="flex-1 ml-64 flex flex-col">
+        <div className="flex-1 md:ml-64 flex flex-col">
           <Outlet />
         </div>
       </div>
