@@ -11,7 +11,7 @@ export function CollectionLayout() {
 
   return (
     <div className="">
-      <div className="border-b flex items-center justify-between py-[22px] px-8">
+      <div className="border-b fixed z-10 right-0 left-64 top-0 bg-background flex items-center justify-between py-[22px] px-8">
         <h1 className="text-lg font-medium tracking-tight capitalize">
           {title ?? (
             <div className="h-4 w-40 rounded-md bg-muted/75 animate-pulse"></div>
@@ -19,7 +19,7 @@ export function CollectionLayout() {
         </h1>
         <CollectionToolbar />
       </div>
-      <div className="p-8 space-y-8">
+      <div className="p-8 mt-[77px] space-y-8">
         <Outlet />
       </div>
     </div>

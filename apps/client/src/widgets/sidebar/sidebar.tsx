@@ -8,7 +8,7 @@ export function Sidebar() {
   const logout = useLogout();
 
   return (
-    <aside className="w-64 space-y-4 p-6 sticky inset-y-0 left-0 border-r">
+    <aside className="w-64 fixed bg-background space-y-4 p-6 inset-y-0 left-0 border-r">
       <ProfileMenu onLogout={() => logout.mutate()} profile={profile} />
       <Separator />
       <BookmarkModalAdd />

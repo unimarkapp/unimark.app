@@ -44,7 +44,7 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
       {isError && <div>{error.message}</div>}
       {isLoading && <Loading />}
       {data?.length === 0 && <Empty />}
-      <ul className="grid grid-cols-4 gap-4">
+      <ul className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
         {data?.map((bookmark) => (
           <BookmarkCard
             key={bookmark.id}
