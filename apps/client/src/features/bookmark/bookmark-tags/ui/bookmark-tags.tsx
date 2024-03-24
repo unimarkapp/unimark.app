@@ -43,7 +43,6 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         },
         (data) => {
           if (data) {
-            console.log("bookmarks", data);
             return data.map((bookmark) =>
               bookmark.id === id
                 ? { ...bookmark, tags: [...bookmark.tags, tag] }
