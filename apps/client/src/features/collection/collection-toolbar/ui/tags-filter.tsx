@@ -66,9 +66,9 @@ export function TagsFilter({ tags }: Props) {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput placeholder={"title"} />
+          <CommandInput placeholder="Tag name..." />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>No tags found.</CommandEmpty>
             <CommandGroup>
               {tags.map((option) => {
                 const isSelected = searchParams
