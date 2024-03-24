@@ -4,12 +4,12 @@ import { Outlet, useParams } from "react-router-dom";
 import { PanelRightClose } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { useSidebar } from "@/shared/hooks";
+import { CollectionSettings } from "@/features/collection/collection-settings";
 
 export function CollectionLayout() {
   const params = useParams();
   const { toggleSidebar } = useSidebar();
   const { data: collections } = trpc.collections.list.useQuery();
-
   const collection = collections?.find((c) => c.id === params.collection_id);
   const title = params.collection_id ? collection?.name : "All Bookmarks";
 
@@ -30,6 +30,9 @@ export function CollectionLayout() {
               <div className="h-4 w-40 rounded-md bg-muted/75 animate-pulse"></div>
             )}
           </h1>
+          {title && params.collection_id && (
+            <CollectionSettings id={params.collection_id} initialName={title} />
+          )}
         </div>
         <CollectionToolbar />
       </div>

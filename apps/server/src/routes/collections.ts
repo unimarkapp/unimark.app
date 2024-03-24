@@ -29,6 +29,19 @@ export const collectionsRouter = t.router({
 
       return collection;
     }),
+  rename: authedProcedure
+    .input(z.object({ id: z.string(), name: z.string() }))
+    .mutation(async ({ ctx: { user }, input }) => {
+      const [collection] = await db
+        .update(collections)
+        .set({ name: input.name })
+        .where(
+          and(eq(collections.id, input.id), eq(collections.ownerId, user.id))
+        )
+        .returning();
+
+      return collection;
+    }),
   delete: authedProcedure
     .input(z.string())
     .mutation(async ({ ctx: { user }, input }) => {
