@@ -6,11 +6,20 @@ import { useSidebar } from "@/shared/hooks";
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { PanelRightOpen } from "lucide-react";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export function Sidebar() {
+  const location = useLocation();
   const { data: profile } = useProfile();
-  const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { isSidebarOpen, toggleSidebar, closeSidebar } = useSidebar();
   const logout = useLogout();
+
+  useEffect(() => {
+    closeSidebar();
+    // TODO: Probably there is a better way
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   return (
     <aside
