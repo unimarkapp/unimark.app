@@ -45,6 +45,7 @@ export function BookmarkModalEdit({ open, onCloseModal }: Props) {
   const update = trpc.bookmarks.update.useMutation({
     onSuccess() {
       utils.bookmarks.list.invalidate();
+      utils.collections.list.invalidate();
       utils.stats.all.invalidate();
       onOpenChange(false);
       form.reset();
