@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 export function AuthLayout() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div>
+      <div className="p-4">
         <Outlet />
       </div>
       <div className="bg-black dark:border-l hidden lg:flex items-center justify-center flex-col gap-4">
