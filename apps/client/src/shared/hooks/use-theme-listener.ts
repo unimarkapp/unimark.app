@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export function ThemeListener() {
+export function useThemeListener() {
   function update(e: MediaQueryListEvent) {
     if (!("theme" in localStorage)) {
       e.matches
@@ -18,6 +18,4 @@ export function ThemeListener() {
       mediaQuery.removeEventListener("change", update);
     };
   }, []);
-
-  return null;
 }

@@ -12,8 +12,11 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast } from "sonner";
 import { Toaster } from "@/shared/ui/sonner";
 import { SidebarProvider } from "@/shared/contexts";
+import { useThemeListener } from "@/shared/hooks";
 
 export default function App() {
+  useThemeListener();
+
   const queryClient = new QueryClient({
     mutationCache: new MutationCache({
       onError: (cause) => {
@@ -22,6 +25,7 @@ export default function App() {
       },
     }),
   });
+
   const trpcClient = trpc.createClient({
     links: [
       httpBatchLink({
