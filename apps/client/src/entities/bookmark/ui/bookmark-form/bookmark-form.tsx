@@ -13,6 +13,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Textarea } from "@/shared/ui/textarea";
+import { FormMessage } from "@/shared/ui/form-message";
 
 interface Props {
   isSubmitting: boolean;
@@ -29,12 +30,7 @@ export function BookmarkForm({
   onUrlChange,
   onSubmit,
 }: Props) {
-  const {
-    handleSubmit,
-    control,
-    register,
-    formState: { errors },
-  } = useFormContext<Form>();
+  const { handleSubmit, control, register } = useFormContext<Form>();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
@@ -64,19 +60,21 @@ export function BookmarkForm({
               control={control}
               defaultValue=""
               disabled={isFetching}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id="url"
-                  placeholder="Enter URL"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    onUrlChange?.(e);
-                  }}
-                />
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Input
+                    {...field}
+                    id="url"
+                    placeholder="Enter URL"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      onUrlChange?.(e);
+                    }}
+                  />
+                  {error ? <FormMessage>{error.message}</FormMessage> : null}
+                </>
               )}
             />
-            {errors.url && <p className="text-red-500">{errors.url.message}</p>}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
@@ -100,22 +98,25 @@ export function BookmarkForm({
             <Controller
               control={control}
               name="collectionId"
-              render={({ field }) => (
-                <Select
-                  defaultValue={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select collection" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {collections?.map((collection) => (
-                      <SelectItem value={collection.id} key={collection.id}>
-                        {collection.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Select
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select collection" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {collections?.map((collection) => (
+                        <SelectItem value={collection.id} key={collection.id}>
+                          {collection.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {error ? <FormMessage>{error?.message}</FormMessage> : null}
+                </>
               )}
             />
           </div>
