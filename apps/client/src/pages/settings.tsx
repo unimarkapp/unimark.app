@@ -1,20 +1,11 @@
-import { Button } from "@/shared/ui/button";
 import { useProfile } from "@/entities/profile";
-import { trpc } from "@/shared/trpc";
-import { Badge } from "@/shared/ui/badge";
 import { Input } from "@/shared/ui/input";
 import { Separator } from "@/shared/ui/separator";
 import { ThemeSwitcher } from "@/shared/ui/theme-switcher";
+import { TagsManager } from "@/features/tags/manager";
 
 export default function Settings() {
-  const utils = trpc.useUtils();
   const { data: profile } = useProfile();
-  const { data: tags } = trpc.tags.list.useQuery();
-  const mutation = trpc.tags.delete.useMutation({
-    onSuccess: () => {
-      utils.tags.list.invalidate();
-    },
-  });
 
   return (
     <div className="">
@@ -67,27 +58,7 @@ export default function Settings() {
           </div>
 
           <div className="col-span-8">
-            {tags?.length ? (
-              <ul className="space-y-2 max-w-[200px]">
-                {tags?.map((tag) => (
-                  <li
-                    key={tag.id}
-                    className="flex items-center justify-between gap-1"
-                  >
-                    <Badge variant="secondary">{tag.name}</Badge>
-                    <Button
-                      size="sm"
-                      className="h-5 px-3"
-                      onClick={() => mutation.mutate(tag.id)}
-                    >
-                      Delete
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">You don't have any tags.</p>
-            )}
+            <TagsManager />
           </div>
         </div>
       </div>
