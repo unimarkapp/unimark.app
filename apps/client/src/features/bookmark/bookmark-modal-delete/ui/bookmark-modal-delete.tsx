@@ -24,6 +24,7 @@ export function BookmarkModalDelete({ open, onCloseModal }: Props) {
 
   const remove = trpc.bookmarks.delete.useMutation({
     onSuccess: async () => {
+      await utils.stats.all.invalidate();
       await utils.bookmarks.list.invalidate();
 
       utils.collections.list.invalidate();
