@@ -96,6 +96,21 @@ export const bookmarksRouter = t.router({
 
       return bookmark;
     }),
+  import: authedProcedure
+    .input(z.array(z.object({url: z.string(), collectionId: z.string()})))
+    .mutation(async ({ ctx: { user }, input }) => {
+      const importedBoomarks = await Promise.all(input.map(async (bookmarkData) => {
+        const parsedBookmarkData = await parser(bookmarkData.url);
+        return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id};
+      }));
+      
+      const [bookmark] = await db
+        .insert(bookmarks)
+        .values(importedBoomarks)
+        .returning();
+
+      return bookmark;
+    }),
   update: authedProcedure
     .input(bookmarkInputSchema.extend({ id: z.string() }))
     .mutation(async ({ input }) => {
