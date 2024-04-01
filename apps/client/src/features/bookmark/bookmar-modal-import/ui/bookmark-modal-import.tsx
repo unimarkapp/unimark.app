@@ -22,25 +22,54 @@ export function BookmarkModalImport() {
   const form = useForm<ImportBookmarkForm>({
     resolver: zodResolver(importBookmarkSchema),
     defaultValues: {
+      importFile: undefined,
       collectionId: "",
     },
   });
 
-//   const create = trpc.bookmarks.create.useMutation({
-//     onSuccess() {
-//       utils.bookmarks.list.invalidate();
-//       utils.collections.list.invalidate();
-//       utils.stats.all.invalidate();
-//       setSearchParams((prev) => {
-//         prev.delete("modal");
-//         return prev;
-//       });
-//       form.reset();
-//     },
-//   });
+  const create = trpc.bookmarks.import.useMutation({
+    onSuccess() {
+      utils.bookmarks.list.invalidate();
+      utils.stats.all.invalidate();
+      setSearchParams((prev) => {
+        prev.delete("modal");
+        return prev;
+      });
+      form.reset();
+    },
+  });
 
-  function submit(data: ImportBookmarkForm) {
-    // create.mutate(data);
+  async function submit(data: ImportBookmarkForm) {
+    let importedBookmarks: {url: string, collectionId: string}[] = [];
+
+    // To read the imported bookmark file
+    const reader = new FileReader();
+    
+    reader.onload = function (e) {
+      // To parse the html content of the imported bookmark file
+      const parser = new DOMParser();
+
+      if (e?.target?.result === null || e.target === null){
+        return console.error('File is empty');
+      }
+
+      const doc = parser.parseFromString(e.target.result.toString(), 'text/html');
+      const hrefElements = doc.querySelectorAll('[HREF]');
+
+      hrefElements.forEach(element => {
+        const bookmarkUrl = element.getAttribute('HREF');
+        if (bookmarkUrl !== null) {
+          importedBookmarks.push({
+            'url': bookmarkUrl,
+            'collectionId': data.collectionId
+          });
+        }
+      });
+
+      create.mutate(importedBookmarks);
+    }
+
+    await reader.readAsText(data.importFile);
   }
 
   function onOpenChange(open: boolean) {
@@ -74,7 +103,7 @@ export function BookmarkModalImport() {
         </DialogHeader>
         <FormProvider {...form}>
           <ImportBookmarkFormUi
-            isSubmitting={true}
+            isSubmitting={create.isPending}
             collections={collections}
             onSubmit={submit}
           />
