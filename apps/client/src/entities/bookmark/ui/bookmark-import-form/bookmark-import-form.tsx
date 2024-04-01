@@ -33,16 +33,20 @@ export function ImportBookmarkFormUi({
       <div className="grid grid-cols-1 md:grid-cols-2 relative gap-4">
         <div className="space-y-2">
           <div className="space-y-1.5">
-            <Label htmlFor="url">Import File</Label>
+            <Label htmlFor="importFile">Import File</Label>
             <Controller
               name="importFile"
               control={control}
               render={({ field }) => (
-                <Input
-                  // {...field}
+                 <Input
                   id="importFile"
                   type="file"
                   accept=".html"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      field.onChange(e.target.files[0]);
+                    }
+                  }}
                 />
               )}
             />
@@ -76,11 +80,6 @@ export function ImportBookmarkFormUi({
             {isSubmitting ? "Importing..." : "Import bookmarks"}
           </Button>
         </div>
-        {/* {isFetching && (
-          <div className="flex backdrop-blur-sm absolute inset-0 bg-background/20 items-center justify-center py-4">
-            <Loader2 size={20} className="animate-spin" />
-          </div>
-        )} */}
       </div>
     </form>
   );
