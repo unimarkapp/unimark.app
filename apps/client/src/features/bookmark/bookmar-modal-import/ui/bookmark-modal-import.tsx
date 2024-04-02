@@ -43,35 +43,38 @@ export function BookmarkModalImport() {
   });
 
   async function submit(data: ImportForm) {
-    const importedBookmarks: {url: string, collectionId: string}[] = [];
+    const importedBookmarks: { url: string; collectionId: string }[] = [];
 
     // To read the imported bookmark file
     const reader = new FileReader();
-    
+
     reader.onload = function (e) {
       // To parse the html content of the imported bookmark file
       const parser = new DOMParser();
 
-      if (!e?.target?.result){
+      if (!e?.target?.result) {
         toast.error("Something went wrong.");
         return;
       }
 
-      const doc = parser.parseFromString(e.target.result.toString(), 'text/html');
-      const hrefElements = doc.querySelectorAll('[HREF]');
+      const doc = parser.parseFromString(
+        e.target.result.toString(),
+        "text/html",
+      );
+      const hrefElements = doc.querySelectorAll("[HREF]");
 
-      hrefElements.forEach(element => {
-        const bookmarkUrl = element.getAttribute('HREF');
+      hrefElements.forEach((element) => {
+        const bookmarkUrl = element.getAttribute("HREF");
         if (bookmarkUrl) {
           importedBookmarks.push({
-            'url': bookmarkUrl,
-            'collectionId': data.collectionId
+            url: bookmarkUrl,
+            collectionId: data.collectionId,
           });
         }
       });
 
       create.mutate(importedBookmarks);
-    }
+    };
 
     await reader.readAsText(data.importFile);
   }
@@ -96,8 +99,8 @@ export function BookmarkModalImport() {
       onOpenChange={onOpenChange}
     >
       <DialogTrigger asChild>
-        <Button variant='outline' className="px-2">
-          <Upload/>
+        <Button variant="outline" className="px-2">
+          <Upload />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">

@@ -38,7 +38,7 @@ export function ImportBookmarkForm({
               name="importFile"
               control={control}
               render={({ field }) => (
-                 <Input
+                <Input
                   id="importFile"
                   type="file"
                   accept=".html"
@@ -50,7 +50,9 @@ export function ImportBookmarkForm({
                 />
               )}
             />
-            {errors.importFile && <p className="text-red-500">{errors.importFile.message}</p>}
+            {errors.importFile && (
+              <p className="text-red-500">{errors.importFile.message}</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="collection">Collection</Label>

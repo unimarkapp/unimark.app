@@ -22,7 +22,7 @@ export const bookmarksRouter = t.router({
         collectionId: z.string().optional(),
         query: z.string().optional(),
         tags: z.array(z.string()).optional(),
-      })
+      }),
     )
     .query(async ({ ctx: { user }, input }) => {
       let bookmarksByTags: string[] = [];
@@ -31,7 +31,7 @@ export const bookmarksRouter = t.router({
         const collection = await db.query.collections.findFirst({
           where: and(
             eq(collections.ownerId, user.id),
-            eq(collections.id, input.collectionId)
+            eq(collections.id, input.collectionId),
           ),
         });
 
@@ -64,7 +64,7 @@ export const bookmarksRouter = t.router({
           ...(input.query ? [ilike(bookmarks.title, `%${input.query}%`)] : []),
           ...(bookmarksByTags?.length
             ? [inArray(bookmarks.id, bookmarksByTags)]
-            : [])
+            : []),
         ),
         with: {
           tags: {
@@ -97,13 +97,15 @@ export const bookmarksRouter = t.router({
       return bookmark;
     }),
   import: authedProcedure
-    .input(z.array(z.object({url: z.string(), collectionId: z.string()})))
+    .input(z.array(z.object({ url: z.string(), collectionId: z.string() })))
     .mutation(async ({ ctx: { user }, input }) => {
-      const importedBoomarks = await Promise.all(input.map(async (bookmarkData) => {
-        const parsedBookmarkData = await parser(bookmarkData.url);
-        return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id};
-      }));
-      
+      const importedBoomarks = await Promise.all(
+        input.map(async (bookmarkData) => {
+          const parsedBookmarkData = await parser(bookmarkData.url);
+          return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id };
+        }),
+      );
+
       const [bookmark] = await db
         .insert(bookmarks)
         .values(importedBoomarks)
@@ -146,8 +148,8 @@ export const bookmarksRouter = t.router({
         .where(
           and(
             eq(bookmarksTags.bookmarkId, input.bookmarkId),
-            eq(bookmarksTags.tagId, input.tagId)
-          )
+            eq(bookmarksTags.tagId, input.tagId),
+          ),
         );
     }),
   delete: authedProcedure
