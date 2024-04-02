@@ -25,12 +25,22 @@ export function ImportBookmarkForm({
   collections,
   onSubmit,
 }: Props) {
-  const { handleSubmit, control, setValue, resetField } =
+  const { handleSubmit, control, setValue, setError, resetField } =
     useFormContext<ImportForm>();
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "text/html": [".html", ".htm"],
+    },
+  });
 
   function onDrop(files: File[]) {
+    if (files.length === 0) {
+      return setError("importFile", {
+        message: "Please choose .html format files only",
+      });
+    }
     setValue("importFile", files[0], { shouldValidate: true });
   }
 
