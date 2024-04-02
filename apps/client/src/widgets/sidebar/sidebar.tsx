@@ -46,7 +46,7 @@ export function Sidebar() {
       <div className="space-y-4">
         <ProfileMenu onLogout={() => logout.mutate()} profile={profile} />
         <Separator />
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1">
           <BookmarkModalAdd />
           <BookmarkModalImport />
         </div>
