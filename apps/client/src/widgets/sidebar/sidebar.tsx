@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { PanelRightOpen } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { BookmarkModalImport } from "@/features/bookmark/bookmar-modal-import";
 
 export function Sidebar() {
   const location = useLocation();
@@ -45,7 +46,10 @@ export function Sidebar() {
       <div className="space-y-4">
         <ProfileMenu onLogout={() => logout.mutate()} profile={profile} />
         <Separator />
-        <BookmarkModalAdd />
+        <div className="flex gap-2">
+          <BookmarkModalAdd />
+          <BookmarkModalImport />
+        </div>
         <CollectionsList />
       </div>
     </aside>
