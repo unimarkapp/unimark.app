@@ -1,4 +1,4 @@
-import type { ImportBookmarkForm } from "./types";
+import type { ImportForm } from "./types";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import {
@@ -13,11 +13,11 @@ import { Button } from "@/shared/ui/button";
 
 interface Props {
   isSubmitting: boolean;
-  onSubmit: (data: ImportBookmarkForm) => void;
+  onSubmit: (data: ImportForm) => void;
   collections?: { id: string; name: string }[];
 }
 
-export function ImportBookmarkFormUi({
+export function ImportBookmarkForm({
   isSubmitting,
   collections,
   onSubmit,
@@ -26,7 +26,7 @@ export function ImportBookmarkFormUi({
     handleSubmit,
     control,
     formState: { errors },
-  } = useFormContext<ImportBookmarkForm>();
+  } = useFormContext<ImportForm>();
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">

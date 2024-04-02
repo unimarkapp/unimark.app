@@ -1,4 +1,4 @@
-import type { ImportBookmarkForm } from "@/entities/bookmark";
+import type { ImportForm } from "@/entities/bookmark";
 import { Button } from "@/shared/ui/button";
 import { trpc } from "@/shared/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/dialog";
-import { ImportBookmarkFormUi, importBookmarkSchema } from "@/entities/bookmark";
+import { ImportBookmarkForm, importBookmarkSchema } from "@/entities/bookmark";
 import { useParams, useSearchParams } from "react-router-dom";
 
 export function BookmarkModalImport() {
@@ -20,7 +20,7 @@ export function BookmarkModalImport() {
   const params = useParams();
   const utils = trpc.useUtils();
   const { data: collections } = trpc.collections.list.useQuery();
-  const form = useForm<ImportBookmarkForm>({
+  const form = useForm<ImportForm>({
     resolver: zodResolver(importBookmarkSchema),
     defaultValues: {
       importFile: undefined,
@@ -41,7 +41,7 @@ export function BookmarkModalImport() {
     },
   });
 
-  async function submit(data: ImportBookmarkForm) {
+  async function submit(data: ImportForm) {
     const importedBookmarks: {url: string, collectionId: string}[] = [];
 
     // To read the imported bookmark file
@@ -105,7 +105,7 @@ export function BookmarkModalImport() {
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...form}>
-          <ImportBookmarkFormUi
+          <ImportBookmarkForm
             isSubmitting={create.isPending}
             collections={collections}
             onSubmit={submit}

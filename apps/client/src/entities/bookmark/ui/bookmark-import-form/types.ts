@@ -12,4 +12,4 @@ export const importBookmarkSchema = z.object({
   collectionId: z.string().min(1, "Collection is required"),
 });
 
-export type ImportBookmarkForm = z.infer<typeof importBookmarkSchema>;
+export type ImportForm = z.infer<typeof importBookmarkSchema>;
