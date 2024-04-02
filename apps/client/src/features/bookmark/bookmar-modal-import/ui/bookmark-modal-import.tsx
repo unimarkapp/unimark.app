@@ -1,4 +1,5 @@
 import type { ImportForm } from "@/entities/bookmark";
+import { Upload } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { trpc } from "@/shared/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -95,9 +96,11 @@ export function BookmarkModalImport() {
       onOpenChange={onOpenChange}
     >
       <DialogTrigger asChild>
-        <Button className="w-full">Import Bookmark </Button>
+        <Button variant='outline' size='sm'>
+          <Upload/>
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-5xl">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Import bookmark</DialogTitle>
           <DialogDescription>
