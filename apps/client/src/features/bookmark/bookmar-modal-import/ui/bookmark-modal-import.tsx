@@ -3,6 +3,7 @@ import { Button } from "@/shared/ui/button";
 import { trpc } from "@/shared/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -41,7 +42,7 @@ export function BookmarkModalImport() {
   });
 
   async function submit(data: ImportBookmarkForm) {
-    let importedBookmarks: {url: string, collectionId: string}[] = [];
+    const importedBookmarks: {url: string, collectionId: string}[] = [];
 
     // To read the imported bookmark file
     const reader = new FileReader();
@@ -50,8 +51,9 @@ export function BookmarkModalImport() {
       // To parse the html content of the imported bookmark file
       const parser = new DOMParser();
 
-      if (e?.target?.result === null || e.target === null){
-        return console.error('File is empty');
+      if (!e?.target?.result){
+        toast.error("Something went wrong.");
+        return;
       }
 
       const doc = parser.parseFromString(e.target.result.toString(), 'text/html');
@@ -59,7 +61,7 @@ export function BookmarkModalImport() {
 
       hrefElements.forEach(element => {
         const bookmarkUrl = element.getAttribute('HREF');
-        if (bookmarkUrl !== null) {
+        if (bookmarkUrl) {
           importedBookmarks.push({
             'url': bookmarkUrl,
             'collectionId': data.collectionId
