@@ -59,7 +59,7 @@ export function BookmarkModalImport() {
 
       const doc = parser.parseFromString(
         e.target.result.toString(),
-        "text/html",
+        "text/html"
       );
       const hrefElements = doc.querySelectorAll("[HREF]");
 
@@ -99,8 +99,8 @@ export function BookmarkModalImport() {
       onOpenChange={onOpenChange}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="px-2">
-          <Upload />
+        <Button variant="outline" size="icon" className="shrink-0 px-2">
+          <Upload className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
