@@ -66,7 +66,7 @@ export function ImportBookmarkForm({
                 <label
                   {...getRootProps()}
                   className={cn(
-                    "relative flex flex-col items-center justify-center w-full py-6 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/50",
+                    "relative flex flex-col items-center justify-center w-full py-6 border-2 border-dashed rounded-lg cursor-pointer bg-muted/20 hover:bg-muted/30",
                     isDragActive && "border-primary"
                   )}
                 >
