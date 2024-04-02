@@ -8,7 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { PanelRightOpen } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { BookmarkModalImport } from "@/features/bookmark/bookmar-modal-import";
+import { BookmarkModalImport } from "@/features/bookmark/bookmark-modal-import";
 
 export function Sidebar() {
   const location = useLocation();
