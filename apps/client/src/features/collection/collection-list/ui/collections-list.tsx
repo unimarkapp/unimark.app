@@ -1,7 +1,8 @@
 import { Separator } from "@/shared/ui/separator";
 import { trpc } from "@/shared/trpc";
 import { CollectionCreate } from "@/features/collection/collection-create";
-import { CollectionHomeItem, CollectionItem } from "@/entities/collection";
+import { CollectionStaticItem, CollectionItem } from "@/entities/collection";
+import { Bookmark, Trash2 } from "lucide-react";
 
 export function CollectionsList() {
   const { data: collections } = trpc.collections.list.useQuery();
@@ -9,7 +10,18 @@ export function CollectionsList() {
 
   return (
     <ul className="space-y-1 text-sm">
-      <CollectionHomeItem count={stats?.bookmarks} />
+      <CollectionStaticItem
+        icon={Bookmark}
+        name="All Bookmarks"
+        to="/"
+        count={stats?.bookmarks}
+      />
+      <CollectionStaticItem
+        icon={Trash2}
+        name="Trash"
+        to="/trash"
+        count={stats?.deleted}
+      />
       <li>
         <Separator />
       </li>

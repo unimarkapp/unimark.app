@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, isNull } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { bookmarks, bookmarksTags, collections } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
@@ -22,7 +22,8 @@ export const bookmarksRouter = t.router({
         collectionId: z.string().optional(),
         query: z.string().optional(),
         tags: z.array(z.string()).optional(),
-      }),
+        deleted: z.boolean().optional(),
+      })
     )
     .query(async ({ ctx: { user }, input }) => {
       let bookmarksByTags: string[] = [];
@@ -31,7 +32,7 @@ export const bookmarksRouter = t.router({
         const collection = await db.query.collections.findFirst({
           where: and(
             eq(collections.ownerId, user.id),
-            eq(collections.id, input.collectionId),
+            eq(collections.id, input.collectionId)
           ),
         });
 
@@ -65,6 +66,9 @@ export const bookmarksRouter = t.router({
           ...(bookmarksByTags?.length
             ? [inArray(bookmarks.id, bookmarksByTags)]
             : []),
+          ...(input.deleted
+            ? [isNotNull(bookmarks.deletedAt)]
+            : [isNull(bookmarks.deletedAt)])
         ),
         with: {
           tags: {
@@ -103,7 +107,7 @@ export const bookmarksRouter = t.router({
         input.map(async (bookmarkData) => {
           const parsedBookmarkData = await parser(bookmarkData.url);
           return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id };
-        }),
+        })
       );
 
       const [bookmark] = await db
@@ -148,15 +152,42 @@ export const bookmarksRouter = t.router({
         .where(
           and(
             eq(bookmarksTags.bookmarkId, input.bookmarkId),
-            eq(bookmarksTags.tagId, input.tagId),
-          ),
+            eq(bookmarksTags.tagId, input.tagId)
+          )
         );
     }),
-  delete: authedProcedure
+  restore: authedProcedure
+    .input(z.array(z.string()))
+    .mutation(async ({ ctx: { user }, input }) => {
+      await db
+        .update(bookmarks)
+        .set({ deletedAt: null })
+        .where(
+          and(inArray(bookmarks.id, input), eq(bookmarks.ownerId, user.id))
+        );
+    }),
+  moveToTrash: authedProcedure
     .input(z.string())
     .mutation(async ({ ctx: { user }, input }) => {
       await db
-        .delete(bookmarks)
+        .update(bookmarks)
+        .set({ deletedAt: new Date() })
         .where(and(eq(bookmarks.id, input), eq(bookmarks.ownerId, user.id)));
     }),
+  deleteForever: authedProcedure
+    .input(z.array(z.string()))
+    .mutation(async ({ ctx: { user }, input }) => {
+      await db
+        .delete(bookmarks)
+        .where(
+          and(inArray(bookmarks.id, input), eq(bookmarks.ownerId, user.id))
+        );
+    }),
+  emptyTrash: authedProcedure.mutation(async ({ ctx: { user } }) => {
+    await db
+      .delete(bookmarks)
+      .where(
+        and(isNotNull(bookmarks.deletedAt), eq(bookmarks.ownerId, user.id))
+      );
+  }),
 });

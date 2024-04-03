@@ -10,6 +10,7 @@ import Register from "./register";
 import Collection from "./collection";
 import { CollectionLayout } from "@/layouts/collection";
 import { AuthLayout } from "@/layouts/auth";
+import Trash from "./trash";
 
 export function Routing() {
   const { data, isError, error } = useProfile();
@@ -48,6 +49,7 @@ export function Routing() {
       <Route path="/" element={<RootLayout />}>
         <Route path="/" element={<CollectionLayout />}>
           <Route path="" element={<Home />} />
+          <Route path="/trash" element={<Trash />} />
         </Route>
         <Route
           path="/collections/:collection_id"

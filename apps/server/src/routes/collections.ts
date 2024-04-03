@@ -1,4 +1,4 @@
-import { eq, sql, getTableColumns, desc, and } from "drizzle-orm";
+import { eq, sql, getTableColumns, desc, and, isNull } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { authedProcedure, t } from "../trpc.js";
 import { bookmarks, collections } from "../db/schema.js";
@@ -13,7 +13,13 @@ export const collectionsRouter = t.router({
       })
       .from(collections)
       .where(eq(collections.ownerId, user.id))
-      .leftJoin(bookmarks, eq(bookmarks.collectionId, collections.id))
+      .leftJoin(
+        bookmarks,
+        and(
+          eq(bookmarks.collectionId, collections.id),
+          isNull(bookmarks.deletedAt)
+        )
+      )
       .groupBy(collections.id)
       .orderBy(desc(sql`count`));
 
