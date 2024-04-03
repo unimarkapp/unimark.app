@@ -157,10 +157,14 @@ export function BookmarksTrashedList() {
                 return new Set(prev);
               });
             }}
+            isRestoring={restoreMutation.isPending}
+            isDeleting={deleteForeverMutation.isPending}
             onDelete={() => {
               deleteForeverMutation.mutate([bookmark.id]);
             }}
-            onRestore={() => {}}
+            onRestore={() => {
+              restoreMutation.mutate([bookmark.id]);
+            }}
           />
         ))}
       </ul>

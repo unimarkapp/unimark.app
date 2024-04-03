@@ -1,7 +1,7 @@
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
-import { ImageOff } from "lucide-react";
+import { ImageOff, Loader2Icon } from "lucide-react";
 
 interface Props {
   id: string;
@@ -9,6 +9,8 @@ interface Props {
   title: string;
   url: string;
   selected?: boolean;
+  isRestoring?: boolean;
+  isDeleting?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   onDelete: () => void;
   onRestore: () => void;
@@ -20,6 +22,8 @@ export function ListItem({
   title,
   url,
   selected,
+  isRestoring,
+  isDeleting,
   onCheckedChange,
   onDelete,
   onRestore,
@@ -63,16 +67,26 @@ export function ListItem({
             variant="outline"
             className="w-full"
             size="sm"
+            disabled={isRestoring}
           >
-            Restore
+            {isRestoring ? (
+              <Loader2Icon className="w-4 h-4 animate-spin" />
+            ) : (
+              "Restore"
+            )}
           </Button>
           <Button
             onClick={() => onDelete()}
             variant="outline"
             className="w-full"
             size="sm"
+            disabled={isDeleting}
           >
-            Delete
+            {isDeleting ? (
+              <Loader2Icon className="w-4 h-4 animate-spin" />
+            ) : (
+              "Delete"
+            )}
           </Button>
         </div>
       </label>
