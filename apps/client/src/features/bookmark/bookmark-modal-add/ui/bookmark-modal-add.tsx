@@ -1,4 +1,5 @@
 import type { Form } from "@/entities/bookmark";
+import type { ChangeEvent } from "react";
 import { Button } from "@/shared/ui/button";
 import { trpc } from "@/shared/trpc";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,13 +12,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/dialog";
-import { ChangeEvent } from "react";
+import { useState } from "react";
 import { BookmarkForm, schema } from "@/entities/bookmark";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export function BookmarkModalAdd() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const params = useParams();
+  const params = useParams<{ collection_id?: string }>();
+  const [open, setOpen] = useState(false);
   const utils = trpc.useUtils();
   const { data: collections } = trpc.collections.list.useQuery();
   const form = useForm<Form>({
@@ -46,10 +47,7 @@ export function BookmarkModalAdd() {
       utils.bookmarks.list.invalidate();
       utils.collections.list.invalidate();
       utils.stats.all.invalidate();
-      setSearchParams((prev) => {
-        prev.delete("modal");
-        return prev;
-      });
+      setOpen(false);
       parse.reset();
       form.reset();
     },
@@ -64,25 +62,18 @@ export function BookmarkModalAdd() {
   }
 
   function onOpenChange(open: boolean) {
-    if (!open) {
+    if (open) {
+      form.setValue("collectionId", params.collection_id || "");
+    } else {
       parse.reset();
       form.reset();
-    } else {
-      form.setValue("collectionId", params.collection_id || "");
     }
 
-    setSearchParams((prev) => {
-      open ? prev.set("modal", "add-bookmark") : prev.delete("modal");
-
-      return prev;
-    });
+    setOpen(open);
   }
 
   return (
-    <Dialog
-      open={searchParams.get("modal") === "add-bookmark"}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button className="w-full">Add Bookmark </Button>
       </DialogTrigger>
@@ -102,7 +93,6 @@ export function BookmarkModalAdd() {
             onSubmit={submit}
           />
         </FormProvider>
-        {/* <DevTool control={control} /> */}
       </DialogContent>
     </Dialog>
   );

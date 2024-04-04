@@ -14,13 +14,14 @@ import {
   DialogTrigger,
 } from "@/shared/ui/dialog";
 import { ImportBookmarkForm, importBookmarkSchema } from "@/entities/bookmark";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 export function BookmarkModalImport() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const params = useParams();
+  const params = useParams<{ collection_id?: string }>();
   const utils = trpc.useUtils();
   const { data: collections } = trpc.collections.list.useQuery();
+  const [open, setOpen] = useState(false);
   const form = useForm<ImportForm>({
     resolver: zodResolver(importBookmarkSchema),
     defaultValues: {
@@ -34,10 +35,7 @@ export function BookmarkModalImport() {
       utils.bookmarks.list.invalidate();
       utils.collections.list.invalidate();
       utils.stats.all.invalidate();
-      setSearchParams((prev) => {
-        prev.delete("modal");
-        return prev;
-      });
+      setOpen(false);
       form.reset();
     },
   });
@@ -80,24 +78,17 @@ export function BookmarkModalImport() {
   }
 
   function onOpenChange(open: boolean) {
-    if (!open) {
-      form.reset();
-    } else {
+    if (open) {
       form.setValue("collectionId", params.collection_id || "");
+    } else {
+      form.reset();
     }
 
-    setSearchParams((prev) => {
-      open ? prev.set("modal", "import-bookmark") : prev.delete("modal");
-
-      return prev;
-    });
+    setOpen(open);
   }
 
   return (
-    <Dialog
-      open={searchParams.get("modal") === "import-bookmark"}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="shrink-0 px-2">
           <Upload className="w-4 h-4" />

@@ -5,11 +5,13 @@ import { toast } from "sonner";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { BookmarkModalEdit } from "@/features/bookmark/bookmark-modal-edit";
 import { BookmarkModalDelete } from "@/features/bookmark/bookmark-modal-delete";
-import { BookmarkTags } from "@/features/bookmark/bookmark-tags";
+import { useCallback, useState } from "react";
 
 export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
-  const [searchParams, setSearchParams] = useSearchParams();
-
+  const [searchParams] = useSearchParams();
+  const [selectedBookmarkId, setSelectedBookmarkId] = useState<string>();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { data, isLoading, isError, error } = trpc.bookmarks.list.useQuery({
@@ -18,26 +20,30 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
     tags: searchParams.getAll("tags") ?? undefined,
   });
 
-  function openModal(name: "edit" | "delete", bookmarkId: string) {
-    setSearchParams((prev) => {
-      if (prev.get("modal") === name) {
-        prev.delete("modal");
-        prev.delete("bookmarkId");
-      } else {
-        prev.set("modal", name);
-        prev.set("bookmarkId", bookmarkId);
+  const openModal = useCallback(
+    (name: "edit" | "delete", bookmarkId: string) => {
+      setSelectedBookmarkId(bookmarkId);
+      switch (name) {
+        case "edit":
+          setEditModalOpen(true);
+          break;
+        case "delete":
+          setDeleteModalOpen(true);
+          break;
+        default:
+          break;
       }
-      return prev;
-    });
-  }
+    },
+    []
+  );
 
-  function closeModal() {
-    setSearchParams((prev) => {
-      prev.delete("modal");
-      prev.delete("bookmarkId");
-      return prev;
-    });
-  }
+  const onCopyUrl = useCallback(
+    async (url: string) => {
+      await copyToClipboard(url);
+      toast.success("URL copied to clipboard");
+    },
+    [copyToClipboard]
+  );
 
   return (
     <div>
@@ -54,23 +60,21 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
             description={bookmark.description}
             cover={bookmark.cover}
             favicon={bookmark.favicon}
-            footer={<BookmarkTags id={bookmark.id} tags={bookmark.tags} />}
-            onCopyUrl={async () => {
-              await copyToClipboard(bookmark.url);
-              toast.success("URL copied to clipboard");
-            }}
-            onEdit={() => openModal("edit", bookmark.id)}
-            onDelete={() => openModal("delete", bookmark.id)}
+            openModal={openModal}
+            tags={bookmark.tags}
+            onCopyUrl={onCopyUrl}
           />
         ))}
       </ul>
       <BookmarkModalEdit
-        open={searchParams.get("modal") === "edit"}
-        onCloseModal={closeModal}
+        bookmarkId={selectedBookmarkId}
+        open={editModalOpen}
+        onCloseModal={() => setEditModalOpen(false)}
       />
       <BookmarkModalDelete
-        open={searchParams.get("modal") === "delete"}
-        onCloseModal={closeModal}
+        bookmarkId={selectedBookmarkId}
+        open={deleteModalOpen}
+        onCloseModal={() => setDeleteModalOpen(false)}
       />
     </div>
   );

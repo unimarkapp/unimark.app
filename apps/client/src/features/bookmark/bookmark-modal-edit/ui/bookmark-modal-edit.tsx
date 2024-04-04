@@ -10,20 +10,18 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { BookmarkForm, schema } from "@/entities/bookmark";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 
 interface Props {
   open: boolean;
-  onCloseModal: (open: boolean) => void;
+  bookmarkId?: string;
+  onCloseModal: () => void;
 }
 
-export function BookmarkModalEdit({ open, onCloseModal }: Props) {
-  const [searchParams] = useSearchParams();
-  const params = useParams();
-  const bookmarkId = searchParams.get("bookmarkId");
-
-  const collectionId = params.collectionId;
+export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
+  const params = useParams<{ collection_id: string }>();
+  const collectionId = params.collection_id;
   const { data: bookmarks } = trpc.bookmarks.list.useQuery({ collectionId });
   const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
@@ -47,7 +45,7 @@ export function BookmarkModalEdit({ open, onCloseModal }: Props) {
       utils.bookmarks.list.invalidate();
       utils.collections.list.invalidate();
       utils.stats.all.invalidate();
-      onOpenChange(false);
+      onCloseModal();
       form.reset();
     },
   });
@@ -60,7 +58,7 @@ export function BookmarkModalEdit({ open, onCloseModal }: Props) {
     if (!open) {
       form.reset();
     }
-    onCloseModal(open);
+    onCloseModal();
   }
 
   useEffect(() => {
@@ -91,7 +89,6 @@ export function BookmarkModalEdit({ open, onCloseModal }: Props) {
             onSubmit={submit}
           />
         </FormProvider>
-        {/* <DevTool control={control} /> */}
       </DialogContent>
     </Dialog>
   );

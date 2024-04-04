@@ -9,17 +9,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/ui/alert-dialog";
-import { useSearchParams } from "react-router-dom";
 
 interface Props {
   open: boolean;
-  onCloseModal: (type: "delete") => void;
+  bookmarkId?: string;
+  onCloseModal: () => void;
 }
 
-export function BookmarkModalDelete({ open, onCloseModal }: Props) {
-  const [searchParams] = useSearchParams();
-  const bookmarkId = searchParams.get("bookmarkId");
-
+export function BookmarkModalDelete({ open, bookmarkId, onCloseModal }: Props) {
   const utils = trpc.useUtils();
 
   const remove = trpc.bookmarks.moveToTrash.useMutation({
@@ -29,7 +26,7 @@ export function BookmarkModalDelete({ open, onCloseModal }: Props) {
 
       utils.collections.list.invalidate();
 
-      onCloseModal("delete");
+      onCloseModal();
     },
   });
 
@@ -44,7 +41,7 @@ export function BookmarkModalDelete({ open, onCloseModal }: Props) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onCloseModal("delete")}>
+          <AlertDialogCancel onClick={() => onCloseModal()}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
