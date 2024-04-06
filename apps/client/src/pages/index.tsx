@@ -13,11 +13,11 @@ import { AuthLayout } from "@/layouts/auth";
 import Trash from "./trash";
 
 export function Routing() {
-  const { data, isError, error } = useProfile();
+  const { data, error } = useProfile();
 
-  if (!data && !isError) return <Loading />;
+  if (!data && !error) return <Loading />;
 
-  if (isError) {
+  if (error) {
     if (error.data?.httpStatus === 401) {
       return (
         <Routes>
@@ -30,7 +30,13 @@ export function Routing() {
         </Routes>
       );
     } else {
-      return <Error message={error.message} />;
+      return (
+        <Error
+          message={
+            error.message || "Something goes wrong. Please, try again later."
+          }
+        />
+      );
     }
   }
 
