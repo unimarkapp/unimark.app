@@ -119,6 +119,9 @@ importers:
       sonner:
         specifier: ^1.4.3
         version: 1.4.3(react-dom@18.2.0)(react@18.2.0)
+      spin-delay:
+        specifier: ^2.0.0
+        version: 2.0.0(react@18.2.0)
       tailwind-merge:
         specifier: ^2.2.1
         version: 2.2.1
@@ -5210,6 +5213,14 @@ packages:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /spin-delay@2.0.0(react@18.2.0):
+    resolution: {integrity: sha512-uNQnIjJ3Ms5ojVUMJaUZrF2Gs2gsSrVExueYrh8/yGg+ecPj65aZ0QI6ln7dguw9Wpp+bVCqGeY2Q9bT4MCL/A==}
+    peerDependencies:
+      react: '>=17.0.1'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
