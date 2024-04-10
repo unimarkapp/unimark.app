@@ -10,8 +10,8 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { BookmarkForm, schema } from "@/entities/bookmark";
-import { useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo } from "react";
 
 interface Props {
   open: boolean;
@@ -22,10 +22,19 @@ interface Props {
 export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
   const params = useParams<{ collection_id: string }>();
   const collectionId = params.collection_id;
-  const { data: bookmarks } = trpc.bookmarks.list.useQuery({ collectionId });
-  const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
-
+  const [searchParams] = useSearchParams();
   const utils = trpc.useUtils();
+
+  const bookmarksRawData = utils.bookmarks.list.getInfiniteData({
+    collectionId: collectionId,
+    query: searchParams.get("query") ?? undefined,
+    tags: searchParams.getAll("tags") ?? undefined,
+  });
+  const bookmarks = useMemo(() => {
+    return bookmarksRawData?.pages.flatMap((page) => page.bookmarks) ?? [];
+  }, [bookmarksRawData]);
+
+  const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
   const { data: collections } = trpc.collections.list.useQuery();
 

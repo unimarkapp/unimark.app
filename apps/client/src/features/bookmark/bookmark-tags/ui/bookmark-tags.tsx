@@ -35,19 +35,25 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         }
       });
 
-      utils.bookmarks.list.setData(
+      utils.bookmarks.list.setInfiniteData(
         {
           collectionId,
           query: searchParams.get("query") ?? undefined,
           tags: searchParams.getAll("tags") ?? undefined,
         },
         (data) => {
-          if (data) {
-            return data.map((bookmark) =>
-              bookmark.id === id
-                ? { ...bookmark, tags: [...bookmark.tags, tag] }
-                : bookmark
-            );
+          if (data?.pages) {
+            return {
+              ...data,
+              pages: data.pages.map((page) => ({
+                ...page,
+                bookmarks: page.bookmarks.map((bookmark) =>
+                  bookmark.id === id
+                    ? { ...bookmark, tags: [...bookmark.tags, tag] }
+                    : bookmark
+                ),
+              })),
+            };
           }
         }
       );
@@ -62,22 +68,30 @@ export function BookmarkTags({ id, tags: selected }: Props) {
     const isChecked = selected.some((item) => item.id === tag.id);
 
     if (isChecked) {
-      utils.bookmarks.list.setData(
+      utils.bookmarks.list.setInfiniteData(
         {
           collectionId,
           query: searchParams.get("query") ?? undefined,
           tags: searchParams.getAll("tags") ?? undefined,
         },
         (data) => {
-          if (data) {
-            return data.map((bookmark) =>
-              bookmark.id === id
-                ? {
-                    ...bookmark,
-                    tags: bookmark.tags.filter((item) => item.id !== tag.id),
-                  }
-                : bookmark
-            );
+          if (data?.pages) {
+            return {
+              ...data,
+              pages: data.pages.map((page) => ({
+                ...page,
+                bookmarks: page.bookmarks.map((bookmark) =>
+                  bookmark.id === id
+                    ? {
+                        ...bookmark,
+                        tags: bookmark.tags.filter(
+                          (item) => item.id !== tag.id
+                        ),
+                      }
+                    : bookmark
+                ),
+              })),
+            };
           }
         }
       );
@@ -85,7 +99,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
       return;
     }
 
-    utils.bookmarks.list.setData(
+    utils.bookmarks.list.setInfiniteData(
       {
         collectionId,
         query: searchParams.get("query") ?? undefined,
@@ -93,11 +107,17 @@ export function BookmarkTags({ id, tags: selected }: Props) {
       },
       (data) => {
         if (data) {
-          return data.map((bookmark) =>
-            bookmark.id === id
-              ? { ...bookmark, tags: [...bookmark.tags, tag] }
-              : bookmark
-          );
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              bookmarks: page.bookmarks.map((bookmark) =>
+                bookmark.id === id
+                  ? { ...bookmark, tags: [...bookmark.tags, tag] }
+                  : bookmark
+              ),
+            })),
+          };
         }
       }
     );

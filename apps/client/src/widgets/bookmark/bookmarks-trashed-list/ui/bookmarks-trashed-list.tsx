@@ -2,20 +2,40 @@ import { trpc } from "@/shared/trpc";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { ArchiveRestore, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ListItem } from "./list-item";
 import { toast } from "sonner";
+import { useIntersectionObserver } from "@uidotdev/usehooks";
+import { FetchingIndicator } from "@/shared/ui/fetching-indicator";
 
 export function BookmarksTrashedList() {
   const utils = trpc.useUtils();
   const [searchParams] = useSearchParams();
 
-  const { data, isLoading, error } = trpc.bookmarks.list.useQuery({
-    query: searchParams.get("query") ?? undefined,
-    tags: searchParams.getAll("tags") ?? undefined,
-    deleted: true,
+  const [ref, entry] = useIntersectionObserver({
+    threshold: 1,
+    root: null,
+    rootMargin: "0px",
   });
+
+  const {
+    data,
+    isLoading,
+    error,
+    isFetchingNextPage,
+    fetchNextPage,
+    isRefetching,
+  } = trpc.bookmarks.list.useInfiniteQuery(
+    {
+      query: searchParams.get("query") ?? undefined,
+      tags: searchParams.getAll("tags") ?? undefined,
+      deleted: true,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
+  );
 
   const deleteForeverMutation = trpc.bookmarks.deleteForever.useMutation({
     async onSuccess() {
@@ -63,6 +83,21 @@ export function BookmarksTrashedList() {
     setSelected(new Set());
   }
 
+  const bookmarks = useMemo(
+    () => data?.pages.flatMap((page) => page.bookmarks) ?? [],
+    [data]
+  );
+
+  useEffect(() => {
+    if (
+      entry?.isIntersecting &&
+      data?.pages.length &&
+      data?.pages[data.pages.length - 1].nextCursor
+    )
+      fetchNextPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entry]);
+
   if (isLoading) {
     return <Loading />;
   }
@@ -71,7 +106,7 @@ export function BookmarksTrashedList() {
     return <div>{error.message}</div>;
   }
 
-  if (data?.length === 0) {
+  if (data?.pages[0] && data?.pages[0].bookmarks.length === 0) {
     return <Empty />;
   }
 
@@ -139,8 +174,9 @@ export function BookmarksTrashedList() {
         )}
       </div>
       <ul className="space-y-2">
-        {data?.map((bookmark) => (
+        {bookmarks?.map((bookmark) => (
           <ListItem
+            ref={ref}
             id={bookmark.id}
             cover={bookmark.cover}
             title={bookmark.title}
@@ -168,6 +204,10 @@ export function BookmarksTrashedList() {
           />
         ))}
       </ul>
+      <FetchingIndicator
+        isFetchingNextPage={isFetchingNextPage}
+        isRefetching={isRefetching}
+      />
     </div>
   );
 }

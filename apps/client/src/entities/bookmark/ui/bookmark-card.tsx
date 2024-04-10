@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { memo } from "react";
+import { forwardRef, memo } from "react";
 import {
   FilePenLine,
   Files,
@@ -33,22 +33,15 @@ interface Props {
   footer?: ReactNode;
 }
 
-export const BookmarkCard = memo(
-  ({
-    id,
-    url,
-    cover,
-    favicon,
-    title,
-    description,
-    openModal,
-    tags,
-    onCopyUrl,
-  }: Props) => {
+const Card = forwardRef<HTMLLIElement, Props>(
+  (
+    { id, url, cover, favicon, title, description, openModal, tags, onCopyUrl },
+    forwardRef
+  ) => {
     console.log("BookmarkCard", id);
 
     return (
-      <li key={id}>
+      <li key={id} ref={forwardRef}>
         <div className="border rounded-lg shadow-sm flex flex-col justify-between gap-2 p-4 relative h-full">
           <div className="space-y-2">
             <div className="absolute top-2 right-2">
@@ -129,3 +122,5 @@ export const BookmarkCard = memo(
     );
   }
 );
+
+export const BookmarkCard = memo(Card);

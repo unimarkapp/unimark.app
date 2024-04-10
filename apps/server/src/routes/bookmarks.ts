@@ -1,4 +1,13 @@
-import { and, desc, eq, ilike, inArray, isNotNull, isNull } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+} from "drizzle-orm";
 import { db } from "../db/index.js";
 import { bookmarks, bookmarksTags, collections } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
@@ -23,6 +32,8 @@ export const bookmarksRouter = t.router({
         query: z.string().optional(),
         tags: z.array(z.string()).optional(),
         deleted: z.boolean().optional(),
+        limit: z.number().min(1).max(100).default(25),
+        cursor: z.number().nullish(),
       })
     )
     .query(async ({ ctx: { user }, input }) => {
@@ -52,9 +63,11 @@ export const bookmarksRouter = t.router({
         bookmarksByTags = response.map(({ bookmarkId }) => bookmarkId);
 
         if (!bookmarksByTags.length) {
-          return [];
+          return { bookmarks: [], nextCursor: null };
         }
       }
+
+      const { cursor, limit } = input;
 
       const list = await db.query.bookmarks.findMany({
         where: and(
@@ -68,8 +81,11 @@ export const bookmarksRouter = t.router({
             : []),
           ...(input.deleted
             ? [isNotNull(bookmarks.deletedAt)]
-            : [isNull(bookmarks.deletedAt)])
+            : [isNull(bookmarks.deletedAt)]),
+          ...(cursor ? [lt(bookmarks.cursor, cursor)] : [])
         ),
+        orderBy: [desc(bookmarks.cursor)],
+        limit,
         with: {
           tags: {
             columns: {},
@@ -80,15 +96,17 @@ export const bookmarksRouter = t.router({
             },
           },
         },
-        orderBy: [desc(bookmarks.createdAt)],
       });
 
-      return list.map((bookmark) => {
-        return {
-          ...bookmark,
-          tags: bookmark.tags.map(({ tag }) => tag),
-        };
-      });
+      return {
+        bookmarks: list.map((bookmark) => {
+          return {
+            ...bookmark,
+            tags: bookmark.tags.map(({ tag }) => tag),
+          };
+        }),
+        nextCursor: list.length ? list[list.length - 1].cursor : null,
+      };
     }),
   create: authedProcedure
     .input(bookmarkInputSchema)
@@ -103,19 +121,14 @@ export const bookmarksRouter = t.router({
   import: authedProcedure
     .input(z.array(z.object({ url: z.string(), collectionId: z.string() })))
     .mutation(async ({ ctx: { user }, input }) => {
-      const importedBoomarks = await Promise.all(
+      const importedBookmarks = await Promise.all(
         input.map(async (bookmarkData) => {
           const parsedBookmarkData = await parser(bookmarkData.url);
           return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id };
         })
       );
 
-      const [bookmark] = await db
-        .insert(bookmarks)
-        .values(importedBoomarks)
-        .returning();
-
-      return bookmark;
+      await db.insert(bookmarks).values(importedBookmarks).returning();
     }),
   update: authedProcedure
     .input(bookmarkInputSchema.extend({ id: z.string() }))

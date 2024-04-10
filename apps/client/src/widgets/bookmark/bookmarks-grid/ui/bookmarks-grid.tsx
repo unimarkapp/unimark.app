@@ -2,10 +2,14 @@ import { trpc } from "@/shared/trpc";
 import { BookmarkCard } from "@/entities/bookmark";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
+import {
+  useCopyToClipboard,
+  useIntersectionObserver,
+} from "@uidotdev/usehooks";
 import { BookmarkModalEdit } from "@/features/bookmark/bookmark-modal-edit";
 import { BookmarkModalDelete } from "@/features/bookmark/bookmark-modal-delete";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FetchingIndicator } from "@/shared/ui/fetching-indicator";
 
 export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
   const [searchParams] = useSearchParams();
@@ -13,12 +17,29 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
-
-  const { data, isLoading, isError, error } = trpc.bookmarks.list.useQuery({
-    collectionId,
-    query: searchParams.get("query") ?? undefined,
-    tags: searchParams.getAll("tags") ?? undefined,
+  const [ref, entry] = useIntersectionObserver({
+    threshold: 1,
+    root: null,
+    rootMargin: "0px",
   });
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    isFetchingNextPage,
+    isRefetching,
+  } = trpc.bookmarks.list.useInfiniteQuery(
+    {
+      collectionId,
+      query: searchParams.get("query") ?? undefined,
+      tags: searchParams.getAll("tags") ?? undefined,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
+  );
 
   const openModal = useCallback(
     (name: "edit" | "delete", bookmarkId: string) => {
@@ -45,14 +66,30 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
     [copyToClipboard]
   );
 
+  useEffect(() => {
+    if (
+      entry?.isIntersecting &&
+      data?.pages.length &&
+      data?.pages[data.pages.length - 1].nextCursor
+    )
+      fetchNextPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entry]);
+
+  const bookmarks = useMemo(
+    () => data?.pages.flatMap((page) => page.bookmarks) ?? [],
+    [data]
+  );
+
   return (
     <div>
-      {isError && <div>{error.message}</div>}
+      {error && <div>{error.message}</div>}
       {isLoading && <Loading />}
-      {data?.length === 0 && <Empty />}
+      {data?.pages[0] && data?.pages[0].bookmarks.length === 0 && <Empty />}
       <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-        {data?.map((bookmark) => (
+        {bookmarks.map((bookmark) => (
           <BookmarkCard
+            ref={ref}
             key={bookmark.id}
             id={bookmark.id}
             url={bookmark.url}
@@ -66,6 +103,10 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
           />
         ))}
       </ul>
+      <FetchingIndicator
+        isFetchingNextPage={isFetchingNextPage}
+        isRefetching={isRefetching}
+      />
       <BookmarkModalEdit
         bookmarkId={selectedBookmarkId}
         open={editModalOpen}

@@ -5,6 +5,7 @@ import {
   timestamp,
   boolean,
   primaryKey,
+  serial,
 } from "drizzle-orm/pg-core";
 import { generateId } from "lucia";
 
@@ -73,6 +74,7 @@ export const bookmarks = pgTable("bookmark", {
   collectionId: text("collection_id")
     .notNull()
     .references(() => collections.id, { onDelete: "cascade" }),
+  cursor: serial("cursor").primaryKey(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
     mode: "date",
