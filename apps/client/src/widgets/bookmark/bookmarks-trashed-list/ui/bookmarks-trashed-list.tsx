@@ -26,6 +26,7 @@ export function BookmarksTrashedList() {
     isFetchingNextPage,
     fetchNextPage,
     isRefetching,
+    hasNextPage,
   } = trpc.bookmarks.list.useInfiniteQuery(
     {
       query: searchParams.get("query") ?? undefined,
@@ -204,6 +205,11 @@ export function BookmarksTrashedList() {
           />
         ))}
       </ul>
+      {!hasNextPage && bookmarks.length > 16 ? (
+        <p className="flex justify-center items-center text-sm text-muted-foreground gap-1.5">
+          You reached the end of the list
+        </p>
+      ) : null}
       <FetchingIndicator
         isFetchingNextPage={isFetchingNextPage}
         isRefetching={isRefetching}

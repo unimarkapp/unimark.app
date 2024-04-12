@@ -30,6 +30,7 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
     fetchNextPage,
     isFetchingNextPage,
     isRefetching,
+    hasNextPage,
   } = trpc.bookmarks.list.useInfiniteQuery(
     {
       collectionId,
@@ -103,6 +104,11 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
           />
         ))}
       </ul>
+      {!hasNextPage && bookmarks.length > 16 ? (
+        <p className="flex justify-center py-4 items-center text-sm text-muted-foreground gap-1.5">
+          You reached the end of the list
+        </p>
+      ) : null}
       <FetchingIndicator
         isFetchingNextPage={isFetchingNextPage}
         isRefetching={isRefetching}
