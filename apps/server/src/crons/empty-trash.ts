@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { db } from "../db/index.js";
-import { bookmarks } from "@/db/schema.js";
+import { bookmarks } from "../db/schema.js";
 import { lt } from "drizzle-orm";
 
 // Run every hour
