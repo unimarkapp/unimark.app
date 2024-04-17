@@ -114,9 +114,8 @@ export function BookmarksTrashedList() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center gap-4 md:justify-between">
-        <h2 className="space-x-2 font-medium">
-          <span>Bookmarks in trash will be deleted forever after 30 days</span>
-          <Badge variant="outline">Coming soon</Badge>
+        <h2 className="space-x-2 font-medium text-muted-foreground text-sm">
+          Bookmarks in trash will be deleted forever after 30 days
         </h2>
         {selected.size > 0 ? (
           <div className="flex items-center gap-2">
