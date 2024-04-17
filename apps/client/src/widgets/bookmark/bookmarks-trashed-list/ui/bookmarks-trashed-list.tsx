@@ -1,5 +1,4 @@
 import { trpc } from "@/shared/trpc";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { ArchiveRestore, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
