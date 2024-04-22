@@ -22,6 +22,20 @@
       "when": 1713790925633,
       "tag": "0002_tiresome_puma",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1713800117140,
+      "tag": "0003_far_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1713800219690,
+      "tag": "0004_icy_vivisector",
+      "breakpoints": true
     }
   ]
 }

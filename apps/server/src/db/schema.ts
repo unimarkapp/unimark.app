@@ -38,7 +38,7 @@ export const bookmarks = pgTable("bookmark", {
   favicon: text("favicon"),
   ownerId: text("owner_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
   cursor: serial("cursor").primaryKey(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
@@ -71,7 +71,7 @@ export const tags = pgTable("tag", {
   name: text("name").notNull(),
   ownerId: text("owner_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
 });
 
 export const bookmarksTags = pgTable(
