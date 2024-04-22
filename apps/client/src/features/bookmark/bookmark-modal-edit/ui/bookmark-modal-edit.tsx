@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { BookmarkForm, schema } from "@/entities/bookmark";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useMemo } from "react";
 
 interface Props {
@@ -20,13 +20,10 @@ interface Props {
 }
 
 export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
-  const params = useParams<{ collection_id: string }>();
-  const collectionId = params.collection_id;
   const [searchParams] = useSearchParams();
   const utils = trpc.useUtils();
 
   const bookmarksRawData = utils.bookmarks.list.getInfiniteData({
-    collectionId: collectionId,
     query: searchParams.get("query") ?? undefined,
     tags: searchParams.getAll("tags") ?? undefined,
   });
@@ -36,8 +33,6 @@ export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
 
   const bookmark = bookmarks?.find((b) => b.id === bookmarkId);
 
-  const { data: collections } = trpc.collections.list.useQuery();
-
   const form = useForm<Form>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -45,14 +40,12 @@ export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
       title: "",
       description: "",
       cover: "",
-      collectionId: "",
     },
   });
 
   const update = trpc.bookmarks.update.useMutation({
     onSuccess() {
       utils.bookmarks.list.invalidate();
-      utils.collections.list.invalidate();
       utils.stats.all.invalidate();
       onCloseModal();
       form.reset();
@@ -77,7 +70,6 @@ export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
         title: bookmark.title,
         description: bookmark.description!,
         cover: bookmark.cover!,
-        collectionId: bookmark.collectionId,
       });
     }
   }, [bookmark, form]);
@@ -92,11 +84,7 @@ export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...form}>
-          <BookmarkForm
-            isSubmitting={update.isPending}
-            collections={collections}
-            onSubmit={submit}
-          />
+          <BookmarkForm isSubmitting={update.isPending} onSubmit={submit} />
         </FormProvider>
       </DialogContent>
     </Dialog>

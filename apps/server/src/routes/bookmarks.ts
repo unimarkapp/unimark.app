@@ -9,15 +9,13 @@ import {
   lt,
 } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { bookmarks, bookmarksTags, collections } from "../db/schema.js";
+import { bookmarks, bookmarksTags } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
 import { parser } from "../services/parser.js";
 import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 
 const bookmarkInputSchema = z.object({
   url: z.string(),
-  collectionId: z.string(),
   title: z.string(),
   description: z.string().optional(),
   cover: z.string().optional(),
@@ -28,7 +26,6 @@ export const bookmarksRouter = t.router({
   list: authedProcedure
     .input(
       z.object({
-        collectionId: z.string().optional(),
         query: z.string().optional(),
         tags: z.array(z.string()).optional(),
         deleted: z.boolean().optional(),
@@ -38,22 +35,6 @@ export const bookmarksRouter = t.router({
     )
     .query(async ({ ctx: { user }, input }) => {
       let bookmarksByTags: string[] = [];
-
-      if (input.collectionId) {
-        const collection = await db.query.collections.findFirst({
-          where: and(
-            eq(collections.ownerId, user.id),
-            eq(collections.id, input.collectionId)
-          ),
-        });
-
-        if (!collection) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Collection not found.",
-          });
-        }
-      }
 
       if (input.tags?.length) {
         const response = await db.query.bookmarksTags.findMany({
@@ -72,9 +53,6 @@ export const bookmarksRouter = t.router({
       const list = await db.query.bookmarks.findMany({
         where: and(
           eq(bookmarks.ownerId, user.id),
-          ...(input.collectionId
-            ? [eq(bookmarks.collectionId, input.collectionId)]
-            : []),
           ...(input.query ? [ilike(bookmarks.title, `%${input.query}%`)] : []),
           ...(bookmarksByTags?.length
             ? [inArray(bookmarks.id, bookmarksByTags)]
@@ -119,7 +97,7 @@ export const bookmarksRouter = t.router({
       return bookmark;
     }),
   import: authedProcedure
-    .input(z.array(z.object({ url: z.string(), collectionId: z.string() })))
+    .input(z.array(z.object({ url: z.string() })))
     .mutation(async ({ ctx: { user }, input }) => {
       const importedBookmarks = await Promise.all(
         input.map(async (bookmarkData) => {

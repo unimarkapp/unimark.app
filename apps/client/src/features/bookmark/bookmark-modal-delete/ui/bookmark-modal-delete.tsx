@@ -24,8 +24,6 @@ export function BookmarkModalDelete({ open, bookmarkId, onCloseModal }: Props) {
       await utils.stats.all.invalidate();
       await utils.bookmarks.list.invalidate();
 
-      utils.collections.list.invalidate();
-
       onCloseModal();
     },
   });

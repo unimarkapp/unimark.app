@@ -7,8 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useProfile } from "@/entities/profile";
 import Settings from "./settings";
 import Register from "./register";
-import Collection from "./collection";
-import { CollectionLayout } from "@/layouts/collection";
+import { BookmarkLayout } from "@/layouts/bookmark";
 import { AuthLayout } from "@/layouts/auth";
 import Trash from "./trash";
 
@@ -53,15 +52,9 @@ export function Routing() {
   return (
     <Routes>
       <Route path="/" element={<RootLayout />}>
-        <Route path="/" element={<CollectionLayout />}>
+        <Route path="/" element={<BookmarkLayout />}>
           <Route path="" element={<Home />} />
           <Route path="/trash" element={<Trash />} />
-        </Route>
-        <Route
-          path="/collections/:collection_id"
-          element={<CollectionLayout />}
-        >
-          <Route path="" element={<Collection />} />
         </Route>
         <Route path="/settings" element={<Settings />} />
       </Route>

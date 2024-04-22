@@ -27,38 +27,6 @@ export const sessions = pgTable("session", {
   }).notNull(),
 });
 
-export const collections = pgTable("collection", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => generateId(15)),
-  name: text("name").notNull(),
-  ownerId: text("owner_id")
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-    mode: "date",
-  })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", {
-    withTimezone: true,
-    mode: "date",
-  }),
-  deletedAt: timestamp("deleted_at", {
-    withTimezone: true,
-    mode: "date",
-  }),
-});
-
-export const collectionRelations = relations(collections, ({ one, many }) => ({
-  owner: one(users, {
-    fields: [collections.ownerId],
-    references: [users.id],
-  }),
-  bookmarks: many(bookmarks),
-}));
-
 export const bookmarks = pgTable("bookmark", {
   id: text("id")
     .primaryKey()
@@ -71,9 +39,6 @@ export const bookmarks = pgTable("bookmark", {
   ownerId: text("owner_id")
     .notNull()
     .references(() => users.id),
-  collectionId: text("collection_id")
-    .notNull()
-    .references(() => collections.id, { onDelete: "cascade" }),
   cursor: serial("cursor").primaryKey(),
   createdAt: timestamp("created_at", {
     withTimezone: true,
@@ -95,10 +60,6 @@ export const bookmarksRelations = relations(bookmarks, ({ one, many }) => ({
   owner: one(users, {
     fields: [bookmarks.ownerId],
     references: [users.id],
-  }),
-  collection: one(collections, {
-    fields: [bookmarks.collectionId],
-    references: [collections.id],
   }),
   tags: many(bookmarksTags),
 }));

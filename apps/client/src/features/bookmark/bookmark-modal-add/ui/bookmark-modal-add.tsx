@@ -14,13 +14,10 @@ import {
 } from "@/shared/ui/dialog";
 import { useState } from "react";
 import { BookmarkForm, schema } from "@/entities/bookmark";
-import { useParams } from "react-router-dom";
 
 export function BookmarkModalAdd() {
-  const params = useParams<{ collection_id?: string }>();
   const [open, setOpen] = useState(false);
   const utils = trpc.useUtils();
-  const { data: collections } = trpc.collections.list.useQuery();
   const form = useForm<Form>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -29,7 +26,6 @@ export function BookmarkModalAdd() {
       description: "",
       cover: "",
       favicon: "",
-      collectionId: "",
     },
   });
 
@@ -45,7 +41,6 @@ export function BookmarkModalAdd() {
   const create = trpc.bookmarks.create.useMutation({
     onSuccess() {
       utils.bookmarks.list.invalidate();
-      utils.collections.list.invalidate();
       utils.stats.all.invalidate();
       setOpen(false);
       parse.reset();
@@ -62,9 +57,7 @@ export function BookmarkModalAdd() {
   }
 
   function onOpenChange(open: boolean) {
-    if (open) {
-      form.setValue("collectionId", params.collection_id || "");
-    } else {
+    if (!open) {
       parse.reset();
       form.reset();
     }
@@ -88,7 +81,6 @@ export function BookmarkModalAdd() {
           <BookmarkForm
             isSubmitting={create.isPending}
             isFetching={parse.isPending}
-            collections={collections}
             onUrlChange={onUrlChange}
             onSubmit={submit}
           />

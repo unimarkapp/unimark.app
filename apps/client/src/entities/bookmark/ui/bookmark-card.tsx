@@ -38,8 +38,6 @@ const Card = forwardRef<HTMLLIElement, Props>(
     { id, url, cover, favicon, title, description, openModal, tags, onCopyUrl },
     forwardRef
   ) => {
-    console.log("BookmarkCard", id);
-
     return (
       <li key={id} ref={forwardRef}>
         <div className="border rounded-lg shadow-sm flex flex-col justify-between gap-2 p-4 relative h-full">

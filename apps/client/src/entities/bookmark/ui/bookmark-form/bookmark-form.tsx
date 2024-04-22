@@ -2,13 +2,6 @@ import type { ChangeEvent } from "react";
 import type { Form } from "./types";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
 import { Controller, useFormContext } from "react-hook-form";
 import { ImageOff, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
@@ -20,13 +13,11 @@ interface Props {
   isFetching?: boolean;
   onSubmit: (data: Form) => void;
   onUrlChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  collections?: { id: string; name: string }[];
 }
 
 export function BookmarkForm({
   isSubmitting,
   isFetching,
-  collections,
   onUrlChange,
   onSubmit,
 }: Props) {
@@ -35,24 +26,28 @@ export function BookmarkForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
       <div className="grid grid-cols-1 md:grid-cols-2 relative gap-4">
-        <Controller
-          control={control}
-          name="cover"
-          render={({ field }) =>
-            field.value ? (
-              <img
-                src={field.value}
-                alt="cover"
-                className="rounded-lg border"
-              />
-            ) : (
-              <div className="w-full aspect-video rounded-lg border flex items-center justify-center">
-                <ImageOff size={32} className="text-muted-foreground" />
+        <div className=" space-y-1.5">
+          <span className="font-medium text-sm">Preview</span>
+          <Controller
+            control={control}
+            name="cover"
+            render={({ field }) => (
+              <div className="aspect-video flex items-center justify-center rounded-md bg-muted/25 border border-border/75">
+                {field.value ? (
+                  <img
+                    src={field.value}
+                    loading="lazy"
+                    className="rounded-md w-full h-full object-cover"
+                    alt="Preview"
+                  />
+                ) : (
+                  <ImageOff className="text-muted-foreground" />
+                )}
               </div>
-            )
-          }
-        />
-        <div className="space-y-2">
+            )}
+          />
+        </div>
+        <div className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="url">URL</Label>
             <Controller
@@ -91,33 +86,6 @@ export function BookmarkForm({
               id="description"
               rows={3}
               placeholder="Enter bookmark description"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="collection">Collection</Label>
-            <Controller
-              control={control}
-              name="collectionId"
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <Select
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select collection" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collections?.map((collection) => (
-                        <SelectItem value={collection.id} key={collection.id}>
-                          {collection.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {error ? <FormMessage>{error?.message}</FormMessage> : null}
-                </>
-              )}
             />
           </div>
           <Button type="submit" className="w-full" disabled={isSubmitting}>

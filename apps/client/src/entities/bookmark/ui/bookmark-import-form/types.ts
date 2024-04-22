@@ -8,7 +8,6 @@ export const importBookmarkSchema = z.object({
     .refine((file) => ACCEPTED_IMPORT_FILE_TYPE.includes(file.type), {
       message: "Please choose .html format files only",
     }),
-  collectionId: z.string().min(1, "Target collection is required"),
 });
 
 export type ImportForm = z.infer<typeof importBookmarkSchema>;

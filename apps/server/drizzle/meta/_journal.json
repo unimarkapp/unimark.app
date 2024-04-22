@@ -15,6 +15,13 @@
       "when": 1712679397719,
       "tag": "0001_certain_venus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1713790925633,
+      "tag": "0002_tiresome_puma",
+      "breakpoints": true
     }
   ]
 }

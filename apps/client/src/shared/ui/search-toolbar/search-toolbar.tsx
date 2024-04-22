@@ -6,7 +6,7 @@ import { useState } from "react";
 import { TagsFilter } from "./tags-filter";
 import { trpc } from "@/shared/trpc";
 
-export function CollectionToolbar() {
+export function SearchToolbar() {
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState<string>(searchParams.get("query") ?? "");
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ export function CollectionToolbar() {
 
   return (
     <div className="flex items-center gap-2">
+      <SearchInput value={query} onChangeValue={setQuery} />
       {searchParams.size > 0 ? (
         <Button
           variant="ghost"
@@ -31,7 +32,6 @@ export function CollectionToolbar() {
         </Button>
       ) : null}
       {tags.data ? <TagsFilter tags={tags.data} /> : null}
-      <SearchInput value={query} onChangeValue={setQuery} />
     </div>
   );
 }

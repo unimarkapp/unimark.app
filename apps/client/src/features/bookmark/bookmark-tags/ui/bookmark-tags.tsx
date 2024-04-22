@@ -11,7 +11,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { Tags, PlusCircle, Check } from "lucide-react";
 import { useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 interface Props {
   id: string;
@@ -19,10 +19,8 @@ interface Props {
 }
 
 export function BookmarkTags({ id, tags: selected }: Props) {
-  const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const utils = trpc.useUtils();
-  const collectionId = params.collection_id;
   const [query, setQuery] = useState("");
 
   const tags = trpc.tags.list.useQuery();
@@ -31,13 +29,12 @@ export function BookmarkTags({ id, tags: selected }: Props) {
     onSuccess(tag) {
       utils.tags.list.setData(undefined, (data) => {
         if (data) {
-          return [...data, tag];
+          return [...data, { ...tag, count: 1 }];
         }
       });
 
       utils.bookmarks.list.setInfiniteData(
         {
-          collectionId,
           query: searchParams.get("query") ?? undefined,
           tags: searchParams.getAll("tags") ?? undefined,
         },
@@ -70,7 +67,6 @@ export function BookmarkTags({ id, tags: selected }: Props) {
     if (isChecked) {
       utils.bookmarks.list.setInfiniteData(
         {
-          collectionId,
           query: searchParams.get("query") ?? undefined,
           tags: searchParams.getAll("tags") ?? undefined,
         },
@@ -101,7 +97,6 @@ export function BookmarkTags({ id, tags: selected }: Props) {
 
     utils.bookmarks.list.setInfiniteData(
       {
-        collectionId,
         query: searchParams.get("query") ?? undefined,
         tags: searchParams.getAll("tags") ?? undefined,
       },

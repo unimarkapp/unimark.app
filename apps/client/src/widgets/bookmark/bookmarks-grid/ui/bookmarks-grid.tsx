@@ -11,7 +11,7 @@ import { BookmarkModalDelete } from "@/features/bookmark/bookmark-modal-delete";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FetchingIndicator } from "@/shared/ui/fetching-indicator";
 
-export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
+export function BookmarksGrid() {
   const [searchParams] = useSearchParams();
   const [selectedBookmarkId, setSelectedBookmarkId] = useState<string>();
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -33,7 +33,6 @@ export function BookmarksGrid({ collectionId }: { collectionId?: string }) {
     hasNextPage,
   } = trpc.bookmarks.list.useInfiniteQuery(
     {
-      collectionId,
       query: searchParams.get("query") ?? undefined,
       tags: searchParams.getAll("tags") ?? undefined,
     },
@@ -144,9 +143,7 @@ function Empty() {
   return (
     <div className="">
       <h2 className="text-lg font-medium">There is no bookmarks yet</h2>
-      <p className="text-muted-foreground">
-        Added bookmark to this collection apper here.
-      </p>
+      <p className="text-muted-foreground">Added bookmarks apper here.</p>
     </div>
   );
 }

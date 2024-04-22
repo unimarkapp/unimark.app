@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authedProcedure, t } from "../trpc.js";
 import { db } from "../db/index.js";
-import { bookmarks, collections, users } from "../db/schema.js";
+import { bookmarks, bookmarksTags, tags, users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { lucia } from "../auth/index.js";
 import { TRPCError } from "@trpc/server";
@@ -69,25 +69,30 @@ export const authRouter = t.router({
           })
           .returning();
 
-        // Add default collection
-        const [collection] = await db
-          .insert(collections)
-          .values({
-            ownerId: user.id,
-            name: "Websites",
-          })
+        // Add default tag
+        const [tag] = await db
+          .insert(tags)
+          .values({ name: "website", ownerId: user.id })
           .returning();
 
         // Add default bookmark
-        await db.insert(bookmarks).values({
-          title: "Unimark",
-          url: "https://unimark.app",
-          collectionId: collection.id,
-          ownerId: user.id,
-          cover: "https://unimark.app/og-image.png",
-          favicon: "https://unimark.app/favicon.svg",
-          description:
-            "Unimark makes it easy to manage all of your bookmarks. Use our cloud or as a self-hosted and own your data.",
+        const [bookmark] = await db
+          .insert(bookmarks)
+          .values({
+            title: "Unimark",
+            url: "https://unimark.app",
+            ownerId: user.id,
+            cover: "https://unimark.app/og-image.png",
+            favicon: "https://unimark.app/favicon.svg",
+            description:
+              "Unimark makes it easy to manage all of your bookmarks. Use our cloud or as a self-hosted and own your data.",
+          })
+          .returning();
+
+        // Assign default tag to default bookmark
+        await db.insert(bookmarksTags).values({
+          bookmarkId: bookmark.id,
+          tagId: tag.id,
         });
 
         const session = await lucia.createSession(user.id, {});

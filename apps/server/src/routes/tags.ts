@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { authedProcedure, t } from "../trpc.js";
 import { db } from "../db/index.js";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { bookmarksTags, tags } from "../db/schema.js";
 
 const tagNameSchema = z
@@ -12,10 +12,17 @@ export const tagsRouter = t.router({
   list: authedProcedure
     .input(z.object({ query: z.string().optional() }).optional())
     .query(async ({ ctx: { user } }) => {
-      const list = await db.query.tags.findMany({
-        where: eq(tags.ownerId, user.id),
-        columns: { id: true, name: true },
-      });
+      const list = await db
+        .select({
+          id: tags.id,
+          name: tags.name,
+          count: sql<number>`count(${bookmarksTags.bookmarkId})`,
+        })
+        .from(tags)
+        .where(eq(tags.ownerId, user.id))
+        .leftJoin(bookmarksTags, and(eq(bookmarksTags.tagId, tags.id)))
+        .groupBy(tags.id)
+        .orderBy(desc(sql`count`));
 
       return list;
     }),

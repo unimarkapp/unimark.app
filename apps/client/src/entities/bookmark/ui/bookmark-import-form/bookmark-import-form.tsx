@@ -1,13 +1,6 @@
 import type { ImportForm } from "./types";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
 import { Controller, useFormContext } from "react-hook-form";
 import { Button } from "@/shared/ui/button";
 import { useDropzone } from "react-dropzone";
@@ -20,11 +13,7 @@ interface Props {
   collections?: { id: string; name: string }[];
 }
 
-export function ImportBookmarkForm({
-  isSubmitting,
-  collections,
-  onSubmit,
-}: Props) {
+export function ImportBookmarkForm({ isSubmitting, onSubmit }: Props) {
   const { handleSubmit, control, setValue, setError, resetField } =
     useFormContext<ImportForm>();
 
@@ -45,7 +34,7 @@ export function ImportBookmarkForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Controller
         control={control}
         name="importFile"
@@ -106,30 +95,6 @@ export function ImportBookmarkForm({
                   <p className="text-destructive text-sm">{error.message}</p>
                 )}
               </div>
-            )}
-          </div>
-        )}
-      />
-      <Controller
-        control={control}
-        name="collectionId"
-        render={({ field, fieldState: { error } }) => (
-          <div className="space-y-1.5">
-            <Label htmlFor="collection">Target collection</Label>
-            <Select defaultValue={field.value} onValueChange={field.onChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a target collection" />
-              </SelectTrigger>
-              <SelectContent>
-                {collections?.map((collection) => (
-                  <SelectItem value={collection.id} key={collection.id}>
-                    {collection.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {error && (
-              <p className="text-sm text-destructive">{error.message}</p>
             )}
           </div>
         )}
