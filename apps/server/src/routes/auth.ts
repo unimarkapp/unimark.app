@@ -72,7 +72,7 @@ export const authRouter = t.router({
         // Add default tag
         const [tag] = await db
           .insert(tags)
-          .values({ name: "website", ownerId: user.id })
+          .values({ name: "websites", ownerId: user.id })
           .returning();
 
         // Add default bookmark
