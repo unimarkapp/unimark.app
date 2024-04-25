@@ -9,6 +9,7 @@ interface Props {
   cover: string | null;
   title: string;
   url: string;
+  deletedAt: string | null;
   selected?: boolean;
   isRestoring?: boolean;
   isDeleting?: boolean;
@@ -24,6 +25,7 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
       cover,
       title,
       url,
+      deletedAt,
       selected,
       isRestoring,
       isDeleting,
@@ -33,6 +35,13 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
     },
     ref
   ) => {
+    function formatDate(date: string) {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        dateStyle: "full",
+      });
+
+      return formatter.format(new Date(date));
+    }
     return (
       <li key={id} ref={ref}>
         <label
@@ -67,6 +76,11 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
             </a>
             <div>
               <h3 className="font-medium">{title}</h3>
+              {deletedAt ? (
+                <p className="text-muted-foreground text-sm">
+                  Deleted at {formatDate(deletedAt)}
+                </p>
+              ) : null}
             </div>
           </div>
           <div className="flex md:items-center gap-2">

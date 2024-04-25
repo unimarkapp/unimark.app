@@ -180,6 +180,7 @@ export function BookmarksTrashedList() {
             title={bookmark.title}
             url={bookmark.url}
             key={bookmark.id}
+            deletedAt={bookmark.deletedAt}
             selected={selected.has(bookmark.id)}
             onCheckedChange={(checked) => {
               setSelected((prev) => {
