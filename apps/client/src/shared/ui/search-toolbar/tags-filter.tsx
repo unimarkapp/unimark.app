@@ -48,7 +48,7 @@ export function TagsFilter({ tags }: Props) {
                   </Badge>
                 ) : (
                   tags
-                    .filter((tag) => selectedValues.has(tag.id))
+                    .filter((tag) => selectedValues.has(tag.name))
                     .map((tag) => (
                       <Badge
                         variant="secondary"
@@ -73,16 +73,16 @@ export function TagsFilter({ tags }: Props) {
               {tags.map((option) => {
                 const isSelected = searchParams
                   .getAll("tags")
-                  .includes(option.id);
+                  .includes(option.name);
                 return (
                   <CommandItem
                     key={option.id}
                     onSelect={() => {
                       setSearchParams((prev) => {
                         if (isSelected) {
-                          prev.delete("tags", option.id);
+                          prev.delete("tags", option.name);
                         } else {
-                          prev.append("tags", option.id);
+                          prev.append("tags", option.name);
                         }
 
                         return prev;

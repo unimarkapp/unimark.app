@@ -197,7 +197,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
       </Popover>
       <ul className="flex items-center overflow-x-auto gap-1">
         {selected.map((tag) => {
-          const isSelected = searchParams.getAll("tags").includes(tag.id);
+          const isSelected = searchParams.getAll("tags").includes(tag.name);
 
           return (
             <li key={tag.id} className="flex">
@@ -206,8 +206,8 @@ export function BookmarkTags({ id, tags: selected }: Props) {
                 onClick={() => {
                   setSearchParams((prev) => {
                     isSelected
-                      ? prev.delete("tags", tag.id)
-                      : prev.append("tags", tag.id);
+                      ? prev.delete("tags", tag.name)
+                      : prev.append("tags", tag.name);
 
                     return prev;
                   });

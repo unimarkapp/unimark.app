@@ -7,9 +7,12 @@ import {
   isNotNull,
   isNull,
   lt,
+  countDistinct,
+  getTableColumns,
+  sql,
 } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { bookmarks, bookmarksTags } from "../db/schema.js";
+import { bookmarks, bookmarksTags, tags } from "../db/schema.js";
 import { authedProcedure, t } from "../trpc.js";
 import { parser } from "../services/parser.js";
 import { z } from "zod";
@@ -34,55 +37,41 @@ export const bookmarksRouter = t.router({
       })
     )
     .query(async ({ ctx: { user }, input }) => {
-      let bookmarksByTags: string[] = [];
-
-      if (input.tags?.length) {
-        const response = await db.query.bookmarksTags.findMany({
-          where: inArray(bookmarksTags.tagId, input.tags),
-        });
-
-        bookmarksByTags = response.map(({ bookmarkId }) => bookmarkId);
-
-        if (!bookmarksByTags.length) {
-          return { bookmarks: [], nextCursor: null };
-        }
-      }
-
-      const { cursor, limit } = input;
-
-      const list = await db.query.bookmarks.findMany({
-        where: and(
-          eq(bookmarks.ownerId, user.id),
-          ...(input.query ? [ilike(bookmarks.title, `%${input.query}%`)] : []),
-          ...(bookmarksByTags?.length
-            ? [inArray(bookmarks.id, bookmarksByTags)]
-            : []),
-          ...(input.deleted
-            ? [isNotNull(bookmarks.deletedAt)]
-            : [isNull(bookmarks.deletedAt)]),
-          ...(cursor ? [lt(bookmarks.cursor, cursor)] : [])
-        ),
-        orderBy: [desc(bookmarks.cursor)],
-        limit,
-        with: {
-          tags: {
-            columns: {},
-            with: {
-              tag: {
-                columns: { id: true, name: true },
-              },
-            },
-          },
-        },
-      });
+      const list = await db
+        .select({
+          ...getTableColumns(bookmarks),
+          tags: sql<
+            { id: string; name: string }[]
+          >`array_agg(json_build_object('id', ${tags.id}, 'name', ${tags.name}))`,
+        })
+        .from(bookmarks)
+        .leftJoin(bookmarksTags, eq(bookmarks.id, bookmarksTags.bookmarkId))
+        .leftJoin(tags, eq(bookmarksTags.tagId, tags.id))
+        .where(
+          and(
+            eq(bookmarks.ownerId, user.id),
+            input.query
+              ? ilike(bookmarks.title, `%${input.query}%`)
+              : undefined,
+            input.tags?.length ? inArray(tags.name, input.tags) : undefined,
+            input.cursor ? lt(bookmarks.cursor, input.cursor) : undefined,
+            isNull(bookmarks.deletedAt)
+          )
+        )
+        .limit(input.limit)
+        .orderBy(desc(bookmarks.cursor))
+        .groupBy(bookmarks.id)
+        .having(
+          input.tags?.length
+            ? eq(countDistinct(tags.name), input.tags.length)
+            : undefined
+        );
 
       return {
-        bookmarks: list.map((bookmark) => {
-          return {
-            ...bookmark,
-            tags: bookmark.tags.map(({ tag }) => tag),
-          };
-        }),
+        bookmarks: list.map((bookmark) => ({
+          ...bookmark,
+          tags: bookmark.tags.filter((tag) => tag.id && tag.name),
+        })),
         nextCursor: list.length ? list[list.length - 1].cursor : null,
       };
     }),

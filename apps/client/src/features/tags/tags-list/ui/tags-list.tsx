@@ -8,10 +8,10 @@ export function TagsList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data } = trpc.tags.list.useQuery();
 
-  function handleClick(id: string) {
+  function handleClick(name: string) {
     setSearchParams((prev) => {
-      const isSelected = prev.getAll("tags").includes(id);
-      isSelected ? prev.delete("tags", id) : prev.append("tags", id);
+      const isSelected = prev.getAll("tags").includes(name);
+      isSelected ? prev.delete("tags", name) : prev.append("tags", name);
       return prev;
     });
   }
@@ -20,12 +20,12 @@ export function TagsList() {
     <ScrollArea>
       <ul className="space-y-1">
         {data?.map((tag) => {
-          const isSelected = searchParams.getAll("tags").includes(tag.id);
+          const isSelected = searchParams.getAll("tags").includes(tag.name);
           return (
             <li key={tag.id}>
               <button
                 type="button"
-                onClick={() => handleClick(tag.id)}
+                onClick={() => handleClick(tag.name)}
                 className={cn([
                   "inline-flex items-center relative justify-between rounded-md w-full h-[30px] pl-3 pr-4 gap-2",
                   isSelected
