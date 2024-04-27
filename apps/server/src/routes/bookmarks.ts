@@ -48,24 +48,42 @@ export const bookmarksRouter = t.router({
         .leftJoin(bookmarksTags, eq(bookmarks.id, bookmarksTags.bookmarkId))
         .leftJoin(tags, eq(bookmarksTags.tagId, tags.id))
         .where(
-          and(
-            eq(bookmarks.ownerId, user.id),
-            input.query
-              ? ilike(bookmarks.title, `%${input.query}%`)
-              : undefined,
-            input.tags?.length ? inArray(tags.name, input.tags) : undefined,
-            input.cursor ? lt(bookmarks.cursor, input.cursor) : undefined,
-            isNull(bookmarks.deletedAt)
+          inArray(
+            bookmarks.id,
+            db
+              .select({
+                id: bookmarks.id,
+              })
+              .from(bookmarks)
+              .leftJoin(
+                bookmarksTags,
+                eq(bookmarks.id, bookmarksTags.bookmarkId)
+              )
+              .leftJoin(tags, eq(bookmarksTags.tagId, tags.id))
+              .where(
+                and(
+                  eq(bookmarks.ownerId, user.id),
+                  input.query
+                    ? ilike(bookmarks.title, `%${input.query}%`)
+                    : undefined,
+                  input.tags?.length
+                    ? inArray(tags.name, input.tags)
+                    : undefined,
+                  input.cursor ? lt(bookmarks.cursor, input.cursor) : undefined,
+                  isNull(bookmarks.deletedAt)
+                )
+              )
+              .groupBy(bookmarks.id)
+              .having(
+                input.tags?.length
+                  ? eq(countDistinct(tags.name), input.tags.length)
+                  : undefined
+              )
           )
         )
         .limit(input.limit)
         .orderBy(desc(bookmarks.cursor))
-        .groupBy(bookmarks.id)
-        .having(
-          input.tags?.length
-            ? eq(countDistinct(tags.name), input.tags.length)
-            : undefined
-        );
+        .groupBy(bookmarks.id);
 
       return {
         bookmarks: list.map((bookmark) => ({
