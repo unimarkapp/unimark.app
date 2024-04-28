@@ -70,7 +70,9 @@ export const bookmarksRouter = t.router({
                     ? inArray(tags.name, input.tags)
                     : undefined,
                   input.cursor ? lt(bookmarks.cursor, input.cursor) : undefined,
-                  isNull(bookmarks.deletedAt)
+                  input.deleted
+                    ? isNotNull(bookmarks.deletedAt)
+                    : isNull(bookmarks.deletedAt)
                 )
               )
               .groupBy(bookmarks.id)
