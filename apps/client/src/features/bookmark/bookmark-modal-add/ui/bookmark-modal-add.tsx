@@ -14,6 +14,7 @@ import {
 } from "@/shared/ui/dialog";
 import { useState } from "react";
 import { BookmarkForm, schema } from "@/entities/bookmark";
+import { PlusIcon } from "lucide-react";
 
 export function BookmarkModalAdd() {
   const [open, setOpen] = useState(false);
@@ -68,7 +69,9 @@ export function BookmarkModalAdd() {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="w-full">Add Bookmark </Button>
+        <Button className="shrink-0" size="icon">
+          <PlusIcon size={18} />
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-5xl">
         <DialogHeader>

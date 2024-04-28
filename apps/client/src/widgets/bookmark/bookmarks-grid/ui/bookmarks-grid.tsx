@@ -86,7 +86,7 @@ export function BookmarksGrid() {
       {error && <div>{error.message}</div>}
       {isLoading && <Loading />}
       {data?.pages[0] && data?.pages[0].bookmarks.length === 0 && <Empty />}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {bookmarks.map((bookmark) => (
           <BookmarkCard
             ref={ref}

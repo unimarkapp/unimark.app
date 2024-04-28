@@ -1,6 +1,7 @@
 import { Input } from "@/shared/ui/input";
 import { useDebouncedCallback } from "use-debounce";
 import { useSearchParams } from "react-router-dom";
+import { SearchIcon } from "lucide-react";
 
 interface Props {
   value: string;
@@ -21,13 +22,18 @@ export function SearchInput({ value, onChangeValue }: Props) {
   }
 
   return (
-    <form className="flex items-center gap-4">
+    <div className="relative w-full">
+      <label htmlFor="global-search" hidden>
+        search
+      </label>
       <Input
+        id="global-search"
         value={value}
         onChange={(e) => onChange(e)}
         placeholder="Search..."
-        className="max-w-sm h-8"
+        className="h-9 pl-8 lg:w-96 border-0 shadow-none bg-muted focus:bg-transparent"
       />
-    </form>
+      <SearchIcon className="h-4 w-4 absolute top-2.5 text-muted-foreground left-2" />
+    </div>
   );
 }

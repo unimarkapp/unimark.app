@@ -55,8 +55,8 @@ export function Routing() {
         <Route path="/" element={<BookmarkLayout />}>
           <Route path="" element={<Home />} />
           <Route path="/trash" element={<Trash />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
-        <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

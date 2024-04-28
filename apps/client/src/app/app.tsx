@@ -11,7 +11,6 @@ import { TRPCClientError, httpBatchLink } from "@trpc/client";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast } from "sonner";
 import { Toaster } from "@/shared/ui/sonner";
-import { SidebarProvider } from "@/shared/contexts";
 import { useThemeListener } from "@/shared/hooks";
 
 export default function App() {
@@ -40,9 +39,7 @@ export default function App() {
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <SidebarProvider>
-            <Routing />
-          </SidebarProvider>
+          <Routing />
           <Toaster position="top-center" />
           <ReactQueryDevtools client={queryClient} />
         </BrowserRouter>

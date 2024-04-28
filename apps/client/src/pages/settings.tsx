@@ -3,30 +3,16 @@ import { Input } from "@/shared/ui/input";
 import { Separator } from "@/shared/ui/separator";
 import { ThemeSwitcher } from "@/shared/ui/theme-switcher";
 import { TagsManager } from "@/features/tags/manager";
-import { useSidebar } from "@/shared/hooks";
-import { Button } from "@/shared/ui/button";
-import { PanelRightClose } from "lucide-react";
 
 export default function Settings() {
   const { data: profile } = useProfile();
-  const { toggleSidebar } = useSidebar();
 
   return (
     <div className="">
       <div className="border-b flex items-center justify-between h-[77px] px-8">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Button
-            onClick={() => toggleSidebar()}
-            size="icon"
-            className="w-7 h-7 md:hidden text-muted-foreground"
-            variant="secondary"
-          >
-            <PanelRightClose size={18} />
-          </Button>
-          <h1 className="text-lg font-medium tracking-tight capitalize">
-            Settings
-          </h1>
-        </div>
+        <h1 className="text-lg font-medium tracking-tight capitalize">
+          Settings
+        </h1>
       </div>
       <div className="p-8">
         <div className="grid items-center gap-4 lg:grid-cols-12">

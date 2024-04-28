@@ -3,10 +3,11 @@ import { SearchInput } from "./search-input";
 import { Button } from "@/shared/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { cn } from "@/shared/lib";
 import { TagsFilter } from "./tags-filter";
 import { trpc } from "@/shared/trpc";
 
-export function SearchToolbar() {
+export function SearchToolbar({ className }: { className?: string }) {
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState<string>(searchParams.get("query") ?? "");
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export function SearchToolbar() {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn("flex items-center gap-2", className)}>
       <SearchInput value={query} onChangeValue={setQuery} />
       {searchParams.size > 0 ? (
         <Button
