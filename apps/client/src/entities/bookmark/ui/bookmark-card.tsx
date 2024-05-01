@@ -3,7 +3,6 @@ import { forwardRef, memo } from "react";
 import {
   FilePenLine,
   Files,
-  FolderSync,
   ImageOff,
   MoreHorizontal,
   Trash2,
@@ -14,7 +13,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { Button } from "@/shared/ui/button";
@@ -49,28 +47,21 @@ const Card = forwardRef<HTMLLIElement, Props>(
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-44">
+                <DropdownMenuContent className="w-36">
                   <DropdownMenuGroup>
                     <DropdownMenuItem
                       className="gap-2"
                       onClick={() => onCopyUrl(url)}
                     >
-                      <Files className="w-4 h-4" />
+                      <Files className="w-4 h-4 text-muted-foreground" />
                       Copy URL
-                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="gap-2"
                       onClick={() => openModal("edit", id)}
                     >
-                      <FilePenLine className="w-4 h-4" />
+                      <FilePenLine className="w-4 h-4 text-muted-foreground" />
                       Edit
-                      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem disabled={true} className="gap-2">
-                      <FolderSync className="w-4 h-4" />
-                      Move
-                      <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
@@ -78,9 +69,8 @@ const Card = forwardRef<HTMLLIElement, Props>(
                     onClick={() => openModal("delete", id)}
                     className="gap-2"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4 text-muted-foreground" />
                     To trash
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -105,6 +95,7 @@ const Card = forwardRef<HTMLLIElement, Props>(
               {favicon ? (
                 <img
                   src={favicon}
+                  alt={`${title} favicon`}
                   className="w-4 h-4 inline-block rounded-sm mr-2 -mt-[3px]"
                 />
               ) : null}
