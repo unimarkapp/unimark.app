@@ -40,19 +40,19 @@ export function ProfileMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to="/">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <LayoutDashboard className="mr-2 text-muted-foreground h-4 w-4" />
               <span>Home</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to="/settings">
-              <UserIcon className="mr-2 h-4 w-4" />
+              <UserIcon className="mr-2 h-4 text-muted-foreground w-4" />
               <span>Settings</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to="/trash">
-              <Trash2Icon className="mr-2 h-4 w-4" />
+              <Trash2Icon className="mr-2 text-muted-foreground h-4 w-4" />
               <span>Trash</span>
             </Link>
           </DropdownMenuItem>
@@ -60,19 +60,19 @@ export function ProfileMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <a href="https://github.com/unimarkapp/unimark.app" target="_blank">
-            <Github className="mr-2 h-4 w-4" />
+            <Github className="mr-2 text-muted-foreground h-4 w-4" />
             <span>GitHub</span>
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <a href="mailto:hello@unimark.app">
-            <LifeBuoy className="mr-2 h-4 w-4" />
+            <LifeBuoy className="mr-2 text-muted-foreground h-4 w-4" />
             <span>Support</span>
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logout.mutate()}>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="mr-2 text-muted-foreground h-4 w-4" />
           <div>Logout</div>
         </DropdownMenuItem>
       </DropdownMenuContent>
