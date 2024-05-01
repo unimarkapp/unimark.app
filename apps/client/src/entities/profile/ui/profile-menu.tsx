@@ -26,7 +26,7 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="w-full gap-2" variant="outline">
+        <Button className="w-full gap-2 h-8" variant="outline">
           <span className="w-4 h-4 shrink-0 rounded-full bg-gradient-to-bl from-blue-500 to-blue-100"></span>
           <span className="hidden md:inline-block truncate max-w-20">
             {profile?.email}

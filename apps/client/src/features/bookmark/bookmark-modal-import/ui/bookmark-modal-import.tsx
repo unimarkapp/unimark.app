@@ -82,7 +82,7 @@ export function BookmarkModalImport() {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="shrink-0 px-2">
+        <Button variant="outline" size="icon" className="shrink-0 px-2 w-8 h-8">
           <Upload className="w-4 h-4" />
         </Button>
       </DialogTrigger>

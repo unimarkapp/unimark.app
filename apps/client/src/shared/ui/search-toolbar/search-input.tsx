@@ -31,7 +31,7 @@ export function SearchInput({ value, onChangeValue }: Props) {
         value={value}
         onChange={(e) => onChange(e)}
         placeholder="Search..."
-        className="h-9 pl-8 lg:w-96 border-0 shadow-none bg-muted focus:bg-transparent"
+        className="h-8 pl-8 lg:w-96 border-0 shadow-none bg-muted focus:bg-transparent"
       />
       <SearchIcon className="h-4 w-4 absolute top-2.5 text-muted-foreground left-2" />
     </div>

@@ -69,8 +69,8 @@ export function BookmarkModalAdd() {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="shrink-0" size="icon">
-          <PlusIcon size={18} />
+        <Button className="shrink-0 h-8 w-8" size="icon">
+          <PlusIcon className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-5xl">
