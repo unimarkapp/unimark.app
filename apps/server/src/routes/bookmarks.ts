@@ -23,6 +23,7 @@ const bookmarkInputSchema = z.object({
   description: z.string().optional(),
   cover: z.string().optional(),
   favicon: z.string().optional(),
+  tags: z.array(z.string()).optional(),
 });
 
 export const bookmarksRouter = t.router({
@@ -98,10 +99,46 @@ export const bookmarksRouter = t.router({
   create: authedProcedure
     .input(bookmarkInputSchema)
     .mutation(async ({ ctx: { user }, input }) => {
+      const { tags: tagsToAttach } = input;
+
       const [bookmark] = await db
         .insert(bookmarks)
         .values({ ...input, ownerId: user.id })
         .returning();
+
+      if (tagsToAttach?.length) {
+        const createdTags = await db
+          .insert(tags)
+          .values(tagsToAttach.map((name) => ({ name, ownerId: user.id })))
+          .onConflictDoNothing()
+          .returning();
+
+        const createdTagNames = new Set(createdTags.map((tag) => tag.name));
+
+        const existingTags = await db
+          .select()
+          .from(tags)
+          .where(
+            and(
+              eq(tags.ownerId, user.id),
+              inArray(
+                tags.name,
+                tagsToAttach.filter((t) => !createdTagNames.has(t))
+              )
+            )
+          );
+
+        const allTags = [...createdTags, ...existingTags];
+
+        if (allTags.length) {
+          await db.insert(bookmarksTags).values(
+            allTags.map((tag) => ({
+              bookmarkId: bookmark.id,
+              tagId: tag.id,
+            }))
+          );
+        }
+      }
 
       return bookmark;
     }),
