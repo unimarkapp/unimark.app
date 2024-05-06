@@ -6,6 +6,7 @@ import {
   boolean,
   primaryKey,
   serial,
+  unique,
 } from "drizzle-orm/pg-core";
 import { generateId } from "lucia";
 
@@ -64,15 +65,21 @@ export const bookmarksRelations = relations(bookmarks, ({ one, many }) => ({
   tags: many(bookmarksTags),
 }));
 
-export const tags = pgTable("tag", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => generateId(15)),
-  name: text("name").notNull(),
-  ownerId: text("owner_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const tags = pgTable(
+  "tag",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId(15)),
+    name: text("name").notNull(),
+    ownerId: text("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    unique_name: unique("unique_name").on(table.name, table.ownerId),
+  })
+);
 
 export const bookmarksTags = pgTable(
   "bookmarks_tags",
