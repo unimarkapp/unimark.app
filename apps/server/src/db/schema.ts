@@ -40,7 +40,7 @@ export const bookmarks = pgTable("bookmark", {
   ownerId: text("owner_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  cursor: serial("cursor").primaryKey(),
+  cursor: serial("cursor"),
   createdAt: timestamp("created_at", {
     withTimezone: true,
     mode: "date",
