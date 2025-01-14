@@ -12,6 +12,7 @@
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "@lucia-auth/adapter-drizzle": "^1.0.3",
     "@trpc/client": "11.0.0-next-beta.316",
     "@trpc/server": "11.0.0-next-beta.316",

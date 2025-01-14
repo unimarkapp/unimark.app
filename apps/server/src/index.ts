@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import cors from "cors";
 import { appRouter } from "./routes/index.js";
