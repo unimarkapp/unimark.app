@@ -9,6 +9,9 @@ import { Label } from '@/shared/ui/label';
 import Link from 'next/link';
 import { FormMessage } from '@/shared/ui/form-message';
 import { authClient } from '@/shared/auth/client';
+import { LoginWithGithubButton, LoginWithGoogleButton } from '@/features/auth';
+import { AtSignIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useState } from 'react';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required.').email('Email is not valid.'),
@@ -22,6 +25,8 @@ const schema = z.object({
 type Form = z.infer<typeof schema>;
 
 export default function Register() {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const toggleVisibility = () => setIsVisible((prevState) => !prevState);
   const {
     register,
     handleSubmit,
@@ -38,41 +43,80 @@ export default function Register() {
 
   return (
     <div className="flex min-h-screen items-center justify-center flex-col">
-      <form onSubmit={handleSubmit(submit)} className="max-w-sm w-full space-y-4">
-        <div>
+      <div className="max-w-sm w-full space-y-6">
+        <div className="text-center">
           <h1 className="text-xl font-bold">Welcome to Unimark</h1>
           <p className="text-muted-foreground">Let&#39;s get started! Register for an account</p>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" {...register('email')} placeholder="Enter your email" />
-          {errors.email && <FormMessage>{errors.email.message}</FormMessage>}
+        <div className="grid grid-cols-2 gap-2">
+          <LoginWithGoogleButton />
+          <LoginWithGithubButton />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" type="name" {...register('name')} placeholder="Enter your name" />
-          {errors.name && <FormMessage>{errors.name.message}</FormMessage>}
+        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+          <span className="relative z-10 bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            {...register('password')}
-            placeholder="Enter your password"
-          />
-          {errors.password && <FormMessage>{errors.password.message}</FormMessage>}
-        </div>
-        <Button className="w-full" type="submit">
-          Register
-        </Button>
+        <form onSubmit={handleSubmit(submit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <div className="relative">
+              <Input
+                id="email"
+                {...register('email')}
+                className="peer ps-9"
+                placeholder="Email"
+                type="email"
+              />
+              <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+                <AtSignIcon size={16} strokeWidth={2} aria-hidden="true" />
+              </div>
+            </div>
+            {errors.email && <FormMessage>{errors.email.message}</FormMessage>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" type="name" {...register('name')} placeholder="Enter your name" />
+            {errors.name && <FormMessage>{errors.name.message}</FormMessage>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                className="pe-9"
+                {...register('password')}
+                placeholder="Password"
+                type={isVisible ? 'text' : 'password'}
+              />
+              <button
+                className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                type="button"
+                onClick={toggleVisibility}
+                aria-label={isVisible ? 'Hide password' : 'Show password'}
+                aria-pressed={isVisible}
+                aria-controls="password"
+              >
+                {isVisible ? (
+                  <EyeOffIcon size={16} strokeWidth={2} aria-hidden="true" />
+                ) : (
+                  <EyeIcon size={16} strokeWidth={2} aria-hidden="true" />
+                )}
+              </button>
+            </div>
+            {errors.password && <FormMessage>{errors.password.message}</FormMessage>}
+          </div>
+          <Button className="w-full" type="submit">
+            Register
+          </Button>
+        </form>
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
           <Link className="text-foreground font-medium" href="/login">
             Login
           </Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 }

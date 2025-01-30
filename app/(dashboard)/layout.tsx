@@ -10,7 +10,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <div>
       <div className="border-b justify-between sticky z-10 right-0 left-0 top-0 bg-background flex md:items-center gap-2 py-3 px-4 md:px-8">
         <Link href="/" className="inline-flex shrink-0 gap-2 items-center">
-          <Image src="/unimark.svg" width={28} height={28} className="shrink-0" alt="Unimark" />
+          <Image
+            src="/unimark.svg"
+            width={28}
+            priority
+            height={28}
+            className="shrink-0"
+            alt="Unimark"
+          />
           <span className="hidden md:inline-block font-bold">unimark.</span>
         </Link>
         {/*<SearchToolbar />*/}
