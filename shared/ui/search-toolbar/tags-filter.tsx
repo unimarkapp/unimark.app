@@ -1,7 +1,7 @@
-import { CheckIcon, PlusCircle } from "lucide-react";
-import { cn } from "@/shared/lib";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
+import { CheckIcon, PlusCircle } from 'lucide-react';
+import { cn } from '@/shared/lib';
+import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -10,18 +10,18 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/shared/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import { Separator } from "@/shared/ui/separator";
-import { useSearchParams } from "react-router-dom";
+} from '@/shared/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { Separator } from '@/shared/ui/separator';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
 interface Props {
   tags: { id: string; name: string }[];
 }
 
 export function TagsFilter({ tags }: Props) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedValues = new Set(searchParams.getAll("tags"));
+  const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
+  const selectedValues = new Set(queryTags);
 
   return (
     <Popover>
@@ -32,18 +32,12 @@ export function TagsFilter({ tags }: Props) {
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
-              <Badge
-                variant="secondary"
-                className="rounded-sm px-1 font-normal lg:hidden"
-              >
+              <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
                 {selectedValues.size}
               </Badge>
               <div className="hidden space-x-1 lg:flex">
                 {selectedValues.size > 2 ? (
-                  <Badge
-                    variant="secondary"
-                    className="rounded-sm px-1 font-normal"
-                  >
+                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
@@ -71,33 +65,32 @@ export function TagsFilter({ tags }: Props) {
             <CommandEmpty>No tags found.</CommandEmpty>
             <CommandGroup>
               {tags.map((option) => {
-                const isSelected = searchParams
-                  .getAll("tags")
-                  .includes(option.name);
+                const isSelected = queryTags?.includes(option.name);
                 return (
                   <CommandItem
                     key={option.id}
                     onSelect={() => {
-                      setSearchParams((prev) => {
+                      setQueryTags((prev) => {
+                        const prevState = prev ?? [];
                         if (isSelected) {
-                          prev.delete("tags", option.name);
+                          return prevState.length > 1
+                            ? prevState.filter((item) => item !== option.name)
+                            : null;
                         } else {
-                          prev.append("tags", option.name);
+                          return [...prevState, option.name];
                         }
-
-                        return prev;
                       });
                     }}
                   >
                     <div
                       className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                         isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'opacity-50 [&_svg]:invisible',
                       )}
                     >
-                      <CheckIcon className={cn("h-4 w-4")} />
+                      <CheckIcon className={cn('h-4 w-4')} />
                     </div>
                     <span>{option.name}</span>
                   </CommandItem>
@@ -109,12 +102,7 @@ export function TagsFilter({ tags }: Props) {
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() =>
-                      setSearchParams((prev) => {
-                        prev.delete("tags");
-                        return prev;
-                      })
-                    }
+                    onSelect={() => setQueryTags(null)}
                     className="justify-center text-center"
                   >
                     Clear filters

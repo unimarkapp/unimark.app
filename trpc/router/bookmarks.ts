@@ -14,8 +14,8 @@ import {
 import { db } from '@/database';
 import { bookmark, bookmarkTag, tag } from '@/database/schema';
 import { protectedProcedure } from '@/trpc/trpc';
-// import { parser } from "../services/parser.js";
 import { z } from 'zod';
+import { parser } from '@/shared/lib/parser';
 
 const bookmarkInputSchema = z.object({
   url: z.string(),
@@ -30,8 +30,8 @@ export const bookmarksRouter = {
   list: protectedProcedure
     .input(
       z.object({
-        query: z.string().optional(),
-        tags: z.array(z.string()).optional(),
+        query: z.string().nullable(),
+        tags: z.array(z.string()).nullable(),
         deleted: z.boolean().optional(),
         limit: z.number().min(1).max(100).default(25),
         cursor: z.number().nullish(),
@@ -79,16 +79,22 @@ export const bookmarksRouter = {
                 ),
             ),
           )
-          .limit(input.limit)
+          .limit(input.limit + 1)
           .orderBy(desc(bookmark.cursor))
           .groupBy(bookmark.id);
+
+        let nextCursor = null;
+        if (list.length > input.limit) {
+          nextCursor = list[list.length - 2].cursor;
+          list.pop();
+        }
 
         return {
           bookmarks: list.map((bookmark) => ({
             ...bookmark,
             tags: bookmark.tags.filter((tag) => tag.id && tag.name),
           })),
-          nextCursor: list.length ? list[list.length - 1].cursor : null,
+          nextCursor,
         };
       },
     ),
@@ -140,7 +146,7 @@ export const bookmarksRouter = {
         }
       }
 
-      return bookmark;
+      return createdBookmark;
     },
   ),
   import: protectedProcedure.input(z.array(z.object({ url: z.string() }))).mutation(
@@ -150,14 +156,14 @@ export const bookmarksRouter = {
       },
       input,
     }) => {
-      // const importedBookmarks = await Promise.all(
-      //   input.map(async (bookmarkData) => {
-      //     const parsedBookmarkData = await parser(bookmarkData.url);
-      //     return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id };
-      //   }),
-      // );
-      //
-      // await db.insert(bookmark).values(importedBookmarks).returning();
+      const importedBookmarks = await Promise.all(
+        input.map(async (bookmarkData) => {
+          const parsedBookmarkData = await parser(bookmarkData.url);
+          return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id };
+        }),
+      );
+
+      await db.insert(bookmark).values(importedBookmarks).returning();
     },
   ),
   update: protectedProcedure
@@ -172,8 +178,8 @@ export const bookmarksRouter = {
       return updatedBookmark;
     }),
   parse: protectedProcedure.input(z.object({ url: z.string() })).mutation(async ({ input }) => {
-    // const data = await parser(input.url);
-    // return data;
+    const data = await parser(input.url);
+    return data;
   }),
   tag: protectedProcedure
     .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))

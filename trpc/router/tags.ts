@@ -64,7 +64,7 @@ export const tagsRouter = {
 
         await db.insert(bookmarkTag).values({ tagId: createdTag.id, bookmarkId: input.bookmarkId });
 
-        return tag;
+        return createdTag;
       },
     ),
   delete: protectedProcedure.input(z.string()).mutation(

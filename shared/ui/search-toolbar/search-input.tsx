@@ -1,7 +1,8 @@
-import { Input } from "@/shared/ui/input";
-import { useDebouncedCallback } from "use-debounce";
-import { useSearchParams } from "react-router-dom";
-import { SearchIcon } from "lucide-react";
+'use client';
+
+import { Input } from '@/shared/ui/input';
+import { useQueryState } from 'nuqs';
+import { SearchIcon } from 'lucide-react';
 
 interface Props {
   value: string;
@@ -9,14 +10,10 @@ interface Props {
 }
 
 export function SearchInput({ value, onChangeValue }: Props) {
-  const [, setSearchParams] = useSearchParams();
-  const debouncedSetSearchParams = useDebouncedCallback(setSearchParams, 450);
+  const [, setQuery] = useQueryState('query', { throttleMs: 600 });
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    debouncedSetSearchParams((prev) => {
-      prev.set("query", event.target.value);
-      return prev;
-    });
+    setQuery(event.target.value);
 
     onChangeValue(event.target.value);
   }
@@ -31,9 +28,9 @@ export function SearchInput({ value, onChangeValue }: Props) {
         value={value}
         onChange={(e) => onChange(e)}
         placeholder="Search..."
-        className="h-8 pl-8 lg:w-96 border-0 shadow-none bg-muted focus:bg-transparent"
+        className="h-8 border-0 bg-muted pl-8 shadow-none focus:bg-transparent lg:w-96"
       />
-      <SearchIcon className="h-4 w-4 absolute top-2 text-muted-foreground left-2" />
+      <SearchIcon className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
     </div>
   );
 }

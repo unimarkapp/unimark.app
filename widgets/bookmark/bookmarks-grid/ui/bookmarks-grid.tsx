@@ -2,16 +2,17 @@
 
 import { api } from '@/trpc/react';
 import { BookmarkCard } from '@/entities/bookmark';
-// import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useCopyToClipboard, useIntersectionObserver } from '@uidotdev/usehooks';
-// import { BookmarkModalEdit } from '@/features/bookmark/bookmark-modal-edit';
-// import { BookmarkModalDelete } from '@/features/bookmark/bookmark-modal-delete';
+import { BookmarkModalEdit } from '@/features/bookmark/bookmark-modal-edit';
+import { BookmarkModalDelete } from '@/features/bookmark/bookmark-modal-delete';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FetchingIndicator } from '@/shared/ui/fetching-indicator';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
 export function BookmarksGrid() {
-  // const [searchParams] = useSearchParams();
+  const [tags] = useQueryState('tags', parseAsArrayOf(parseAsString));
+  const [query] = useQueryState('query', parseAsString);
   const [selectedBookmarkId, setSelectedBookmarkId] = useState<string>();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -22,16 +23,18 @@ export function BookmarksGrid() {
     rootMargin: '0px',
   });
 
-  const { data, isLoading, error, fetchNextPage, isFetchingNextPage, isRefetching, hasNextPage } =
-    api.bookmark.list.useInfiniteQuery(
-      {
-        query: undefined,
-        tags: undefined,
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-    );
+  const [data, bookmarkListQuery] = api.bookmark.list.useSuspenseInfiniteQuery(
+    {
+      query,
+      tags,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  );
+
+  const { fetchNextPage, error, isLoading, isRefetching, hasNextPage, isFetchingNextPage } =
+    bookmarkListQuery;
 
   const openModal = useCallback((name: 'edit' | 'delete', bookmarkId: string) => {
     setSelectedBookmarkId(bookmarkId);
@@ -61,7 +64,10 @@ export function BookmarksGrid() {
       data?.pages.length &&
       data?.pages[data.pages.length - 1].nextCursor
     )
-      fetchNextPage();
+      console.log('should fetch next page', {
+        nextCursor: data?.pages[data.pages.length - 1].nextCursor,
+      });
+    fetchNextPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entry]);
 
@@ -72,7 +78,7 @@ export function BookmarksGrid() {
       {error && <div>{error.message}</div>}
       {isLoading && <Loading />}
       {data?.pages[0] && data?.pages[0].bookmarks.length === 0 && <Empty />}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {bookmarks.map((bookmark) => (
           <BookmarkCard
             ref={ref}
@@ -90,30 +96,30 @@ export function BookmarksGrid() {
         ))}
       </ul>
       {!hasNextPage && bookmarks.length > 16 ? (
-        <p className="flex justify-center py-4 items-center text-sm text-muted-foreground gap-1.5">
+        <p className="flex items-center justify-center gap-1.5 py-4 text-sm text-muted-foreground">
           You reached the end of the list
         </p>
       ) : null}
       <FetchingIndicator isFetchingNextPage={isFetchingNextPage} isRefetching={isRefetching} />
-      {/*<BookmarkModalEdit*/}
-      {/*  bookmarkId={selectedBookmarkId}*/}
-      {/*  open={editModalOpen}*/}
-      {/*  onCloseModal={() => setEditModalOpen(false)}*/}
-      {/*/>*/}
-      {/*<BookmarkModalDelete*/}
-      {/*  bookmarkId={selectedBookmarkId}*/}
-      {/*  open={deleteModalOpen}*/}
-      {/*  onCloseModal={() => setDeleteModalOpen(false)}*/}
-      {/*/>*/}
+      <BookmarkModalEdit
+        bookmarkId={selectedBookmarkId}
+        open={editModalOpen}
+        onCloseModal={() => setEditModalOpen(false)}
+      />
+      <BookmarkModalDelete
+        bookmarkId={selectedBookmarkId}
+        open={deleteModalOpen}
+        onCloseModal={() => setDeleteModalOpen(false)}
+      />
     </div>
   );
 }
 
 function Loading() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div className="[aspect-ratio:1.1/1] bg-muted animate-pulse rounded-lg" key={i}></div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+      {Array.from({ length: 16 }).map((_, i) => (
+        <div className="animate-pulse rounded-lg bg-muted [aspect-ratio:1.1/1]" key={i}></div>
       ))}
     </div>
   );
@@ -122,7 +128,7 @@ function Loading() {
 function Empty() {
   return (
     <div className="">
-      <h2 className="text-lg font-medium">There is no bookmarks yet</h2>
+      <h2 className="text-lg font-semibold">There is no bookmarks yet</h2>
       <p className="text-muted-foreground">Added bookmarks apper here.</p>
     </div>
   );

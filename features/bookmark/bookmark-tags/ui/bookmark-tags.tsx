@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@/shared/lib';
 import { api } from '@/trpc/react';
 import { Button } from '@/shared/ui/button';
@@ -5,7 +7,7 @@ import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Tags, PlusCircle, Check } from 'lucide-react';
 import { useState } from 'react';
-import { useQueryState, parseAsArrayOf } from 'nuqs';
+import { useQueryState, parseAsArrayOf, parseAsString } from 'nuqs';
 
 interface Props {
   id: string;
@@ -13,11 +15,12 @@ interface Props {
 }
 
 export function BookmarkTags({ id, tags: selected }: Props) {
-  const [queryTags, setQueryTags] = useQueryState('tags');
+  const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
+  const [query, setQuery] = useQueryState('query', parseAsString);
   const utils = api.useUtils();
-  const [query, setQuery] = useState('');
+  const [term, setTerm] = useState('');
 
-  const tags = api.tag.list.useQuery();
+  const [tags] = api.tag.list.useSuspenseQuery();
 
   const createAndTag = api.tag.createAndTag.useMutation({
     onSuccess(tag) {
@@ -29,8 +32,8 @@ export function BookmarkTags({ id, tags: selected }: Props) {
 
       utils.bookmark.list.setInfiniteData(
         {
-          query: searchParams.get('query') ?? undefined,
-          tags: parseAsArrayOf(queryTags) ?? undefined,
+          query,
+          tags: queryTags,
         },
         (data) => {
           if (data?.pages) {
@@ -59,8 +62,8 @@ export function BookmarkTags({ id, tags: selected }: Props) {
     if (isChecked) {
       utils.bookmark.list.setInfiniteData(
         {
-          query: searchParams.get('query') ?? undefined,
-          tags: searchParams.getAll('tags') ?? undefined,
+          query,
+          tags: queryTags,
         },
         (data) => {
           if (data?.pages) {
@@ -87,8 +90,8 @@ export function BookmarkTags({ id, tags: selected }: Props) {
 
     utils.bookmark.list.setInfiniteData(
       {
-        query: searchParams.get('query') ?? undefined,
-        tags: searchParams.getAll('tags') ?? undefined,
+        query,
+        tags: queryTags,
       },
       (data) => {
         if (data) {
@@ -115,21 +118,21 @@ export function BookmarkTags({ id, tags: selected }: Props) {
     <div className="flex items-center gap-1">
       <Popover>
         <PopoverTrigger asChild>
-          <Button size="icon" variant="outline" className="w-[30px] shrink-0 h-[30px]">
+          <Button size="icon" variant="outline" className="h-[30px] w-[30px] shrink-0">
             <Tags size={14} />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-56" align="start">
+        <PopoverContent className="w-56 p-0" align="start">
           <Command>
             <CommandInput
-              value={query}
-              onValueChange={setQuery}
+              value={term}
+              onValueChange={setTerm}
               placeholder="Create or search tags"
             />
             <CommandList className="max-h-56 overflow-y-auto">
-              {tags.data?.length ? (
+              {tags?.length ? (
                 <CommandGroup heading="All tags">
-                  {tags.data.map((tag) => {
+                  {tags.map((tag) => {
                     const isChecked = selected.some((item) => item.id === tag.id);
                     return (
                       <CommandItem
@@ -140,8 +143,8 @@ export function BookmarkTags({ id, tags: selected }: Props) {
                       >
                         <div
                           className={cn([
-                            'w-4 h-4 border rounded flex items-center border-primary/25 justify-center',
-                            isChecked ? 'bg-foreground text-background border-foreground' : '',
+                            'flex h-4 w-4 items-center justify-center rounded border border-primary/25',
+                            isChecked ? 'border-foreground bg-foreground text-background' : '',
                           ])}
                         >
                           {isChecked ? <Check size={12} /> : null}
@@ -152,19 +155,19 @@ export function BookmarkTags({ id, tags: selected }: Props) {
                   })}
                 </CommandGroup>
               ) : (
-                <div className="text-sm flex py-4 justify-center">No tags.</div>
+                <div className="flex justify-center py-4 text-sm">No tags.</div>
               )}
             </CommandList>
-            {query.length && !tags.data?.find(({ name }) => name.includes(query)) ? (
+            {term.length && !tags?.find(({ name }) => name.includes(term)) ? (
               <CommandList>
                 <CommandGroup heading="Click to create">
                   <CommandItem
-                    className="flex justify-between cursor-pointer"
-                    onSelect={() => onCreate(query)}
-                    value={query}
+                    className="flex cursor-pointer justify-between"
+                    onSelect={() => onCreate(term)}
+                    value={term}
                   >
                     <div className="flex items-center gap-2">
-                      <PlusCircle className="w-4 h-4 -mb-px text-muted-foreground shrink-0" />
+                      <PlusCircle className="-mb-px h-4 w-4 shrink-0 text-muted-foreground" />
                       <span>{query}</span>
                     </div>
                   </CommandItem>
@@ -174,23 +177,28 @@ export function BookmarkTags({ id, tags: selected }: Props) {
           </Command>
         </PopoverContent>
       </Popover>
-      <ul className="flex items-center overflow-x-auto gap-1">
+      <ul className="flex items-center gap-1 overflow-x-auto">
         {selected.map((tag) => {
-          const isSelected = searchParams.getAll('tags').includes(tag.name);
+          const isSelected = queryTags?.includes(tag.name);
 
           return (
             <li key={tag.id} className="flex">
               <Button
                 size="sm"
                 onClick={() => {
-                  setSearchParams((prev) => {
-                    isSelected ? prev.delete('tags', tag.name) : prev.append('tags', tag.name);
-
-                    return prev;
+                  setQueryTags((prev) => {
+                    const prevState = prev ?? [];
+                    if (isSelected) {
+                      return prevState.length > 1
+                        ? prevState.filter((item) => item !== tag.name)
+                        : null;
+                    } else {
+                      return [...prevState, tag.name];
+                    }
                   });
                 }}
                 variant={isSelected ? 'default' : 'outline'}
-                className="shrink-0 h-[30px]"
+                className="h-[30px] shrink-0"
               >
                 {tag.name}
               </Button>

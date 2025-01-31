@@ -42,8 +42,8 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center flex-col">
-      <div className="max-w-sm w-full space-y-6">
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="text-xl font-bold">Welcome to Unimark</h1>
           <p className="text-muted-foreground">Let&#39;s get started! Register for an account</p>
@@ -112,7 +112,7 @@ export default function Register() {
         </form>
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link className="text-foreground font-medium" href="/login">
+          <Link className="font-semibold text-foreground" href="/login">
             Login
           </Link>
         </p>

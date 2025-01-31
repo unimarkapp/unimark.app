@@ -20,13 +20,12 @@ import {
   Trash2Icon,
   UserIcon,
 } from 'lucide-react';
-import { useProfile } from '../hooks';
 import { authClient } from '@/shared/auth/client';
 import { useRouter } from 'next/navigation';
+import type { User } from 'better-auth';
 
-export function ProfileMenu() {
+export function ProfileMenu({ user }: { user?: User }) {
   const router = useRouter();
-  const { data: profile } = useProfile();
 
   function signOut() {
     return authClient.signOut({
@@ -41,9 +40,9 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="w-full gap-2 h-8" variant="outline">
-          <span className="w-4 h-4 shrink-0 rounded-full bg-gradient-to-bl from-blue-500 to-blue-100"></span>
-          <span className="hidden md:inline-block truncate max-w-20">{profile?.email}</span>
+        <Button className="h-8 w-full gap-2" variant="outline">
+          <span className="h-4 w-4 shrink-0 rounded-full bg-gradient-to-bl from-blue-500 to-blue-100"></span>
+          <span className="hidden max-w-20 truncate md:inline-block">{user?.email}</span>
           <ChevronsUpDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -53,19 +52,19 @@ export function ProfileMenu() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/">
-              <LayoutDashboard className="mr-2 text-muted-foreground h-4 w-4" />
+              <LayoutDashboard className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Home</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/settings">
-              <UserIcon className="mr-2 h-4 text-muted-foreground w-4" />
+              <UserIcon className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Settings</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/trash">
-              <Trash2Icon className="mr-2 text-muted-foreground h-4 w-4" />
+              <Trash2Icon className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Trash</span>
             </Link>
           </DropdownMenuItem>
@@ -73,19 +72,19 @@ export function ProfileMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <a href="https://github.com/unimarkapp/unimark.app" target="_blank">
-            <Github className="mr-2 text-muted-foreground h-4 w-4" />
+            <Github className="mr-2 h-4 w-4 text-muted-foreground" />
             <span>GitHub</span>
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <a href="mailto:hello@unimark.app">
-            <LifeBuoy className="mr-2 text-muted-foreground h-4 w-4" />
+            <LifeBuoy className="mr-2 h-4 w-4 text-muted-foreground" />
             <span>Support</span>
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={signOut}>
-          <LogOut className="mr-2 text-muted-foreground h-4 w-4" />
+          <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
           <div>Logout</div>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,3 +1,5 @@
+'use client';
+
 import type { Form } from '@/entities/bookmark';
 import { api } from '@/trpc/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +12,7 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog';
 import { BookmarkForm, schema } from '@/entities/bookmark';
-import { useSearchParams } from 'react-router-dom';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useEffect, useMemo } from 'react';
 
 interface Props {
@@ -20,12 +22,13 @@ interface Props {
 }
 
 export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
-  const [searchParams] = useSearchParams();
+  const [query] = useQueryState('query', parseAsString);
+  const [tags] = useQueryState('tags', parseAsArrayOf(parseAsString));
   const utils = api.useUtils();
 
   const bookmarksRawData = utils.bookmark.list.getInfiniteData({
-    query: searchParams.get('query') ?? undefined,
-    tags: searchParams.getAll('tags') ?? undefined,
+    query,
+    tags,
   });
   const bookmarks = useMemo(() => {
     return bookmarksRawData?.pages.flatMap((page) => page.bookmarks) ?? [];

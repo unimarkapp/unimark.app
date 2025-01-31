@@ -1,9 +1,11 @@
-import type { Form } from "@/entities/bookmark";
-import type { ChangeEvent } from "react";
-import { Button } from "@/shared/ui/button";
-import { trpc } from "@/shared/trpc";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
+'use client';
+
+import type { Form } from '@/entities/bookmark';
+import type { ChangeEvent } from 'react';
+import { Button } from '@/shared/ui/button';
+import { api } from '@/trpc/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
   Dialog,
   DialogContent,
@@ -11,38 +13,38 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/shared/ui/dialog";
-import { useState } from "react";
-import { BookmarkForm, schema } from "@/entities/bookmark";
-import { PlusIcon } from "lucide-react";
+} from '@/shared/ui/dialog';
+import { useState } from 'react';
+import { BookmarkForm, schema } from '@/entities/bookmark';
+import { PlusIcon } from 'lucide-react';
 
 export function BookmarkModalAdd() {
   const [open, setOpen] = useState(false);
-  const utils = trpc.useUtils();
+  const utils = api.useUtils();
   const form = useForm<Form>({
     resolver: zodResolver(schema),
     defaultValues: {
-      url: "",
-      title: "",
-      description: "",
-      cover: "",
-      favicon: "",
+      url: '',
+      title: '',
+      description: '',
+      cover: '',
+      favicon: '',
     },
   });
 
-  const parse = trpc.bookmarks.parse.useMutation({
+  const parse = api.bookmark.parse.useMutation({
     onSuccess(data) {
-      form.setValue("title", data.title);
-      form.setValue("description", data.description);
-      form.setValue("cover", data.cover);
-      form.setValue("favicon", data.favicon);
+      form.setValue('title', data.title);
+      form.setValue('description', data.description);
+      form.setValue('cover', data.cover);
+      form.setValue('favicon', data.favicon);
     },
   });
 
-  const create = trpc.bookmarks.create.useMutation({
+  const create = api.bookmark.create.useMutation({
     onSuccess() {
-      utils.bookmarks.list.invalidate();
-      utils.stats.all.invalidate();
+      utils.bookmark.list.invalidate();
+      utils.stat.all.invalidate();
       setOpen(false);
       parse.reset();
       form.reset();
@@ -76,9 +78,7 @@ export function BookmarkModalAdd() {
       <DialogContent className="sm:max-w-5xl">
         <DialogHeader>
           <DialogTitle>Adding bookmark</DialogTitle>
-          <DialogDescription>
-            Just paste the URL and we will fetch metadata.
-          </DialogDescription>
+          <DialogDescription>Just paste the URL and we will fetch metadata.</DialogDescription>
         </DialogHeader>
         <FormProvider {...form}>
           <BookmarkForm

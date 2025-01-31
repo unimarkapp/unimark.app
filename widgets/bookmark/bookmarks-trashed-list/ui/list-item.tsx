@@ -1,15 +1,15 @@
-import { cn } from "@/shared/lib";
-import { Button } from "@/shared/ui/button";
-import { Checkbox } from "@/shared/ui/checkbox";
-import { ImageOff, Loader2Icon } from "lucide-react";
-import { forwardRef } from "react";
+import { cn } from '@/shared/lib';
+import { Button } from '@/shared/ui/button';
+import { Checkbox } from '@/shared/ui/checkbox';
+import { ImageOff, Loader2Icon } from 'lucide-react';
+import { forwardRef } from 'react';
 
 interface Props {
   id: string;
   cover: string | null;
   title: string;
   url: string;
-  deletedAt: string | null;
+  deletedAt: Date | null;
   selected?: boolean;
   isRestoring?: boolean;
   isDeleting?: boolean;
@@ -33,41 +33,38 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
       onDelete,
       onRestore,
     },
-    ref
+    ref,
   ) => {
-    function formatDate(date: string) {
-      const formatter = new Intl.DateTimeFormat("en-US", {
-        dateStyle: "full",
+    function formatDate(date: Date) {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        dateStyle: 'full',
       });
 
-      return formatter.format(new Date(date));
+      return formatter.format(date);
     }
     return (
       <li key={id} ref={ref}>
         <label
           htmlFor={`checkbox-${id}`}
           className={cn(
-            "flex hover:bg-muted/50 flex-col md:flex-row gap-4 md:items-center p-4 justify-between rounded-lg shadow-sm border",
-            selected && "border-primary bg-muted/50"
+            'flex flex-col justify-between gap-4 rounded-lg border p-4 shadow-sm hover:bg-muted/50 md:flex-row md:items-center',
+            selected && 'border-primary bg-muted/50',
           )}
         >
-          <div className="flex flex-col md:flex-row md:items-center gap-4 flex-1">
+          <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-center">
             <div className="flex items-center">
-              <Checkbox
-                id={`checkbox-${id}`}
-                onCheckedChange={onCheckedChange}
-              />
+              <Checkbox id={`checkbox-${id}`} onCheckedChange={onCheckedChange} />
             </div>
             <a
               href={url}
               target="_blank"
-              className="aspect-video md:w-32 flex items-center justify-center rounded bg-muted/25 border border-border/75"
+              className="flex aspect-video items-center justify-center rounded border border-border/75 bg-muted/25 md:w-32"
             >
               {cover ? (
                 <img
                   src={cover}
                   loading="lazy"
-                  className="rounded w-full h-full object-cover"
+                  className="h-full w-full rounded object-cover"
                   alt={title}
                 />
               ) : (
@@ -75,15 +72,13 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
               )}
             </a>
             <div>
-              <h3 className="font-medium">{title}</h3>
+              <h3 className="font-semibold">{title}</h3>
               {deletedAt ? (
-                <p className="text-muted-foreground text-sm">
-                  Deleted at {formatDate(deletedAt)}
-                </p>
+                <p className="text-sm text-muted-foreground">Deleted at {formatDate(deletedAt)}</p>
               ) : null}
             </div>
           </div>
-          <div className="flex md:items-center gap-2">
+          <div className="flex gap-2 md:items-center">
             <Button
               onClick={() => onRestore()}
               variant="outline"
@@ -91,11 +86,7 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
               size="sm"
               disabled={isRestoring}
             >
-              {isRestoring ? (
-                <Loader2Icon className="w-4 h-4 animate-spin" />
-              ) : (
-                "Restore"
-              )}
+              {isRestoring ? <Loader2Icon className="h-4 w-4 animate-spin" /> : 'Restore'}
             </Button>
             <Button
               onClick={() => onDelete()}
@@ -104,15 +95,13 @@ export const ListItem = forwardRef<HTMLLIElement, Props>(
               size="sm"
               disabled={isDeleting}
             >
-              {isDeleting ? (
-                <Loader2Icon className="w-4 h-4 animate-spin" />
-              ) : (
-                "Delete"
-              )}
+              {isDeleting ? <Loader2Icon className="h-4 w-4 animate-spin" /> : 'Delete'}
             </Button>
           </div>
         </label>
       </li>
     );
-  }
+  },
 );
+
+ListItem.displayName = 'ListItem';

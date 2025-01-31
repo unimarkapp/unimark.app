@@ -1,15 +1,21 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-// import { SearchToolbar } from '@/shared/ui/search-toolbar';
+import { SearchToolbar } from '@/shared/ui/search-toolbar';
 import { ProfileMenu } from '@/entities/profile';
 
 import Image from 'next/image';
+import { BookmarkModalAdd } from '@/features/bookmark/bookmark-modal-add';
+import { HydrateClient, api } from '@/trpc/server';
+import { getSession } from '@/shared/auth/sessions';
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  const session = await getSession();
+  await api.tag.list.prefetch();
+
   return (
-    <div>
-      <div className="border-b justify-between sticky z-10 right-0 left-0 top-0 bg-background flex md:items-center gap-2 py-3 px-4 md:px-8">
-        <Link href="/" className="inline-flex shrink-0 gap-2 items-center">
+    <div className="flex min-h-svh flex-col">
+      <div className="sticky left-0 right-0 top-0 z-10 flex justify-between gap-2 border-b bg-background px-4 py-3 md:items-center md:px-8">
+        <Link href="/" className="inline-flex shrink-0 items-center gap-2">
           <Image
             src="/unimark.svg"
             width={28}
@@ -18,16 +24,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             className="shrink-0"
             alt="Unimark"
           />
-          <span className="hidden md:inline-block font-bold">unimark.</span>
+          <span className="hidden font-bold md:inline-block">unimark.</span>
         </Link>
-        {/*<SearchToolbar />*/}
+        <HydrateClient>
+          <SearchToolbar />
+        </HydrateClient>
         <div className="flex items-center gap-2">
-          {/*<BookmarkModalAdd />*/}
+          <BookmarkModalAdd />
           {/*<BookmarkModalImport />*/}
-          <ProfileMenu />
+          <ProfileMenu user={session?.data?.user} />
         </div>
       </div>
-      <div className="md:p-8 p-4 space-y-8">{children}</div>
+      <div className="space-y-8 p-4 md:p-8">{children}</div>
     </div>
   );
 }

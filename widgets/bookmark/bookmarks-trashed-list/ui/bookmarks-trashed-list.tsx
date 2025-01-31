@@ -1,60 +1,60 @@
-import { trpc } from "@/shared/trpc";
-import { Button } from "@/shared/ui/button";
-import { ArchiveRestore, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { ListItem } from "./list-item";
-import { toast } from "sonner";
-import { useIntersectionObserver } from "@uidotdev/usehooks";
-import { FetchingIndicator } from "@/shared/ui/fetching-indicator";
+'use client';
+
+import { api } from '@/trpc/react';
+import { Button } from '@/shared/ui/button';
+import { ArchiveRestore, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs';
+import { ListItem } from './list-item';
+import { toast } from 'sonner';
+import { useIntersectionObserver } from '@uidotdev/usehooks';
+import { FetchingIndicator } from '@/shared/ui/fetching-indicator';
 
 export function BookmarksTrashedList() {
-  const utils = trpc.useUtils();
-  const [searchParams] = useSearchParams();
+  const utils = api.useUtils();
+  const [searchParams] = useQueryStates({
+    query: parseAsString,
+    tags: parseAsArrayOf(parseAsString),
+  });
 
   const [ref, entry] = useIntersectionObserver({
     threshold: 1,
     root: null,
-    rootMargin: "0px",
+    rootMargin: '0px',
   });
 
-  const {
-    data,
-    isLoading,
-    error,
-    isFetchingNextPage,
-    fetchNextPage,
-    isRefetching,
-    hasNextPage,
-  } = trpc.bookmarks.list.useInfiniteQuery(
+  const [data, bookmarksQuery] = api.bookmark.list.useSuspenseInfiniteQuery(
     {
-      query: searchParams.get("query") ?? undefined,
-      tags: searchParams.getAll("tags") ?? undefined,
+      query: searchParams.query,
+      tags: searchParams.tags,
       deleted: true,
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-    }
+    },
   );
 
-  const deleteForeverMutation = trpc.bookmarks.deleteForever.useMutation({
+  const { isLoading, error, isFetchingNextPage, fetchNextPage, isRefetching, hasNextPage } =
+    bookmarksQuery;
+
+  const deleteForeverMutation = api.bookmark.deleteForever.useMutation({
     async onSuccess() {
       await onMutationSucces();
-      toast.success("Bookmarks deleted forever");
+      toast.success('Bookmarks deleted forever');
     },
   });
 
-  const emptyTrashMutation = trpc.bookmarks.emptyTrash.useMutation({
+  const emptyTrashMutation = api.bookmark.emptyTrash.useMutation({
     async onSuccess() {
       await onMutationSucces();
-      toast.success("Trash is empty");
+      toast.success('Trash is empty');
     },
   });
 
-  const restoreMutation = trpc.bookmarks.restore.useMutation({
+  const restoreMutation = api.bookmark.restore.useMutation({
     async onSuccess() {
       await onMutationSucces();
-      toast.success("Bookmarks restored");
+      toast.success('Bookmarks restored');
     },
   });
 
@@ -73,19 +73,16 @@ export function BookmarksTrashedList() {
   }
 
   async function onMutationSucces() {
-    await utils.bookmarks.list.invalidate({
-      query: searchParams.get("query") ?? undefined,
-      tags: searchParams.getAll("tags") ?? undefined,
+    await utils.bookmark.list.invalidate({
+      query: searchParams.query,
+      tags: searchParams.tags,
       deleted: true,
     });
-    await utils.stats.all.invalidate();
+    await utils.stat.all.invalidate();
     setSelected(new Set());
   }
 
-  const bookmarks = useMemo(
-    () => data?.pages.flatMap((page) => page.bookmarks) ?? [],
-    [data]
-  );
+  const bookmarks = useMemo(() => data?.pages.flatMap((page) => page.bookmarks) ?? [], [data]);
 
   useEffect(() => {
     if (
@@ -111,15 +108,13 @@ export function BookmarksTrashedList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row md:items-center gap-4 md:justify-between">
-        <h2 className="space-x-2 font-medium text-muted-foreground text-sm">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <h2 className="space-x-2 text-sm font-semibold text-muted-foreground">
           Bookmarks in trash will be deleted forever after 30 days
         </h2>
         {selected.size > 0 ? (
           <div className="flex items-center gap-2">
-            <div className="font-medium text-sm">
-              Selected ({selected.size})
-            </div>
+            <div className="text-sm font-semibold">Selected ({selected.size})</div>
             <Button
               onClick={() => restore()}
               variant="outline"
@@ -130,7 +125,7 @@ export function BookmarksTrashedList() {
                 <span>Restoring...</span>
               ) : (
                 <>
-                  <ArchiveRestore className="w-4 h-4 mr-1" />
+                  <ArchiveRestore className="mr-1 h-4 w-4" />
                   Restore
                 </>
               )}
@@ -145,7 +140,7 @@ export function BookmarksTrashedList() {
                 <span>Deleting...</span>
               ) : (
                 <>
-                  <Trash2 className="w-4 h-4 mr-1" />
+                  <Trash2 className="mr-1 h-4 w-4" />
                   Delete forever
                 </>
               )}
@@ -163,7 +158,7 @@ export function BookmarksTrashedList() {
                 <span>Emptying...</span>
               ) : (
                 <>
-                  <Trash2 className="w-4 h-4 mr-1" />
+                  <Trash2 className="mr-1 h-4 w-4" />
                   Empty trash
                 </>
               )}
@@ -204,14 +199,11 @@ export function BookmarksTrashedList() {
         ))}
       </ul>
       {!hasNextPage && bookmarks.length > 16 ? (
-        <p className="flex justify-center items-center text-sm text-muted-foreground gap-1.5">
+        <p className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
           You reached the end of the list
         </p>
       ) : null}
-      <FetchingIndicator
-        isFetchingNextPage={isFetchingNextPage}
-        isRefetching={isRefetching}
-      />
+      <FetchingIndicator isFetchingNextPage={isFetchingNextPage} isRefetching={isRefetching} />
     </div>
   );
 }
@@ -219,8 +211,8 @@ export function BookmarksTrashedList() {
 function Loading() {
   return (
     <div className="flex flex-col gap-4">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div className="h-28 bg-muted animate-pulse rounded-lg" key={i}></div>
+      {Array.from({ length: 16 }).map((_, i) => (
+        <div className="h-28 animate-pulse rounded-lg bg-muted" key={i}></div>
       ))}
     </div>
   );
@@ -229,10 +221,8 @@ function Loading() {
 function Empty() {
   return (
     <div className="">
-      <h2 className="text-lg font-medium">Your trash is empty.</h2>
-      <p className="text-muted-foreground">
-        Move bookmarks you don't need to trash.
-      </p>
+      <h2 className="text-lg font-semibold">Your trash is empty.</h2>
+      <p className="text-muted-foreground">Move bookmarks you don&apos;t need to trash.</p>
     </div>
   );
 }

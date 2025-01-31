@@ -1,7 +1,7 @@
-import { BookmarksGrid } from '@/widgets/bookmark/bookmarks-grid';
 import { HydrateClient, api } from '@/trpc/server';
+import { BookmarksTrashedList } from '@/widgets/bookmark/bookmarks-trashed-list';
 
-export default async function Home({
+export default async function Tash({
   searchParams,
 }: {
   searchParams: Promise<{ query?: string; tags?: string }>;
@@ -11,12 +11,13 @@ export default async function Home({
   await api.bookmark.list.prefetchInfinite({
     query,
     tags: tags?.split(',') ?? null,
+    deleted: true,
   });
 
   return (
     <div className="space-y-8">
       <HydrateClient>
-        <BookmarksGrid />
+        <BookmarksTrashedList />
       </HydrateClient>
     </div>
   );

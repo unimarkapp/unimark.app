@@ -1,11 +1,11 @@
-import type { ImportForm } from "./types";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-import { Controller, useFormContext } from "react-hook-form";
-import { Button } from "@/shared/ui/button";
-import { useDropzone } from "react-dropzone";
-import { FileCode2, UploadCloud, X } from "lucide-react";
-import { cn } from "@/shared/lib";
+import type { ImportForm } from './types';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
+import { Controller, useFormContext } from 'react-hook-form';
+import { Button } from '@/shared/ui/button';
+import { useDropzone } from 'react-dropzone';
+import { FileCode2, UploadCloud, X } from 'lucide-react';
+import { cn } from '@/shared/lib';
 
 interface Props {
   isSubmitting: boolean;
@@ -14,23 +14,22 @@ interface Props {
 }
 
 export function ImportBookmarkForm({ isSubmitting, onSubmit }: Props) {
-  const { handleSubmit, control, setValue, setError, resetField } =
-    useFormContext<ImportForm>();
+  const { handleSubmit, control, setValue, setError, resetField } = useFormContext<ImportForm>();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "text/html": [".html", ".htm"],
+      'text/html': ['.html', '.htm'],
     },
   });
 
   function onDrop(files: File[]) {
     if (files.length === 0) {
-      return setError("importFile", {
-        message: "Please choose .html format files only",
+      return setError('importFile', {
+        message: 'Please choose .html format files only',
       });
     }
-    setValue("importFile", files[0], { shouldValidate: true });
+    setValue('importFile', files[0], { shouldValidate: true });
   }
 
   return (
@@ -42,22 +41,22 @@ export function ImportBookmarkForm({ isSubmitting, onSubmit }: Props) {
           <div className="space-y-1.5">
             <Label htmlFor="importFile">Import File</Label>
             {field.value ? (
-              <div className="p-2 border justify-between items-center flex w-64 gap-2 rounded-md shadow-sm">
-                <div className="font-medium min-w-0 flex-1 flex items-center gap-1 truncate text-sm">
-                  <FileCode2 className="w-4 h-4 text-muted-foreground" />
+              <div className="flex w-64 items-center justify-between gap-2 rounded-md border p-2 shadow-sm">
+                <div className="flex min-w-0 flex-1 items-center gap-1 truncate text-sm font-semibold">
+                  <FileCode2 className="h-4 w-4 text-muted-foreground" />
                   {field.value.name}
                 </div>
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    return resetField("importFile", undefined);
+                    return resetField('importFile', undefined);
                   }}
                   size="icon"
                   variant="outline"
                   type="button"
-                  className="w-6 h-6"
+                  className="h-6 w-6"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
@@ -65,12 +64,12 @@ export function ImportBookmarkForm({ isSubmitting, onSubmit }: Props) {
                 <label
                   {...getRootProps()}
                   className={cn(
-                    "relative flex flex-col items-center justify-center w-full py-6 border-2 border-dashed rounded-lg cursor-pointer bg-muted/20 hover:bg-muted/30",
-                    isDragActive && "border-primary"
+                    'relative flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/20 py-6 hover:bg-muted/30',
+                    isDragActive && 'border-primary',
                   )}
                 >
-                  <div className=" text-center">
-                    <div className=" border p-2 rounded-md bg-background max-w-min mx-auto">
+                  <div className="text-center">
+                    <div className="mx-auto max-w-min rounded-md border bg-background p-2">
                       <UploadCloud size={20} />
                     </div>
 
@@ -78,9 +77,7 @@ export function ImportBookmarkForm({ isSubmitting, onSubmit }: Props) {
                       <span className="font-semibold">Drag file</span>
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {isDragActive
-                        ? "Drop the file here"
-                        : "or click to browse"}
+                      {isDragActive ? 'Drop the file here' : 'or click to browse'}
                     </p>
                   </div>
                 </label>
@@ -91,16 +88,14 @@ export function ImportBookmarkForm({ isSubmitting, onSubmit }: Props) {
                   type="file"
                   accept=".html"
                 />
-                {error && (
-                  <p className="text-destructive text-sm">{error.message}</p>
-                )}
+                {error && <p className="text-sm text-destructive">{error.message}</p>}
               </div>
             )}
           </div>
         )}
       />
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Importing..." : "Import bookmarks"}
+        {isSubmitting ? 'Importing...' : 'Import bookmarks'}
       </Button>
     </form>
   );

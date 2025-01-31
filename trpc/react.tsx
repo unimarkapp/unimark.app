@@ -10,6 +10,7 @@ import SuperJSON from 'superjson';
 import type { AppRouter } from './index';
 
 import { createQueryClient } from './query-client';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 const getQueryClient = () => {
@@ -60,6 +61,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <api.Provider client={trpcClient} queryClient={queryClient}>
         {props.children}
+        <ReactQueryDevtools client={queryClient} />
       </api.Provider>
     </QueryClientProvider>
   );

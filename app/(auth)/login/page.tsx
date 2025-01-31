@@ -45,8 +45,8 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center flex-col">
-      <div className="max-w-sm w-full space-y-6">
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <h1 className="text-xl font-bold">Login</h1>
           <p className="text-muted-foreground">Welcome back! Login to your account</p>
@@ -81,7 +81,7 @@ export default function Login() {
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
               <Link
-                className="text-xs font-medium text-muted-foreground hover:text-foreground"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground"
                 href="/reset password"
               >
                 Forgot password?
@@ -118,7 +118,7 @@ export default function Login() {
         </form>
         <p className="text-center text-sm text-muted-foreground">
           Don&#39;t have an account?{' '}
-          <Link className="text-foreground font-medium" href="/register">
+          <Link className="font-semibold text-foreground" href="/register">
             Create one
           </Link>
         </p>
