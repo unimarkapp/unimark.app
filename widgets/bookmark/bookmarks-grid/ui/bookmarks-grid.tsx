@@ -63,11 +63,9 @@ export function BookmarksGrid() {
       entry?.isIntersecting &&
       data?.pages.length &&
       data?.pages[data.pages.length - 1].nextCursor
-    )
-      console.log('should fetch next page', {
-        nextCursor: data?.pages[data.pages.length - 1].nextCursor,
-      });
-    fetchNextPage();
+    ) {
+      fetchNextPage();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entry]);
 

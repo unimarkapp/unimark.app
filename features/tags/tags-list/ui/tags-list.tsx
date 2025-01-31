@@ -1,18 +1,21 @@
-import { cn } from "@/shared/lib";
-import { trpc } from "@/shared/trpc";
-import { ScrollArea } from "@/shared/ui/scroll-area";
-import { Hash } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { cn } from '@/shared/lib';
+import { api } from '@/trpc/react';
+import { ScrollArea } from '@/shared/ui/scroll-area';
+import { Hash } from 'lucide-react';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 
 export function TagsList() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { data } = trpc.tags.list.useQuery();
+  const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
+  const { data } = api.tag.list.useQuery();
 
   function handleClick(name: string) {
-    setSearchParams((prev) => {
-      const isSelected = prev.getAll("tags").includes(name);
-      isSelected ? prev.delete("tags", name) : prev.append("tags", name);
-      return prev;
+    setQueryTags((prev) => {
+      const prevState = prev ?? [];
+      const isSelected = prev?.includes(name);
+      if (isSelected) {
+        return prevState.length > 1 ? prevState.filter((state) => state !== name) : null;
+      }
+      return [...prevState, name];
     });
   }
 
@@ -20,26 +23,22 @@ export function TagsList() {
     <ScrollArea>
       <ul className="space-y-1">
         {data?.map((tag) => {
-          const isSelected = searchParams.getAll("tags").includes(tag.name);
+          const isSelected = queryTags?.includes(tag.name);
           return (
             <li key={tag.id}>
               <button
                 type="button"
                 onClick={() => handleClick(tag.name)}
                 className={cn([
-                  "inline-flex items-center relative justify-between rounded-md w-full h-[30px] pl-3 pr-4 gap-2",
-                  isSelected
-                    ? "bg-muted/75"
-                    : "text-muted-foreground hover:bg-muted/50",
+                  'relative inline-flex h-[30px] w-full items-center justify-between gap-2 rounded-md pl-3 pr-4',
+                  isSelected ? 'bg-muted/75' : 'text-muted-foreground hover:bg-muted/50',
                 ])}
               >
-                <div className="flex items-center text-sm gap-2">
+                <div className="flex items-center gap-2 text-sm">
                   <Hash className="size-4" />
                   {tag.name}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {tag.count ?? 0}
-                </div>
+                <div className="text-xs text-muted-foreground">{tag.count ?? 0}</div>
               </button>
             </li>
           );
