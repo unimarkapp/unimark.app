@@ -1,0 +1,1 @@
+CREATE INDEX "bookmark_cursor_idx" ON "bookmark" USING btree ("cursor");

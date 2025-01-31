@@ -119,34 +119,38 @@ export const verification = pgTable(
   ],
 );
 
-export const bookmark = pgTable('bookmark', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => generateId(15)),
-  title: text('title').notNull(),
-  url: text('url').notNull(),
-  description: text('description'),
-  cover: text('cover'),
-  favicon: text('favicon'),
-  ownerId: text('owner_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  cursor: serial('cursor'),
-  createdAt: timestamp('created_at', {
-    withTimezone: true,
-    mode: 'date',
-  })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', {
-    withTimezone: true,
-    mode: 'date',
-  }),
-  deletedAt: timestamp('deleted_at', {
-    withTimezone: true,
-    mode: 'date',
-  }),
-});
+export const bookmark = pgTable(
+  'bookmark',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => generateId(15)),
+    title: text('title').notNull(),
+    url: text('url').notNull(),
+    description: text('description'),
+    cover: text('cover'),
+    favicon: text('favicon'),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    cursor: serial('cursor'),
+    createdAt: timestamp('created_at', {
+      withTimezone: true,
+      mode: 'date',
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', {
+      withTimezone: true,
+      mode: 'date',
+    }),
+    deletedAt: timestamp('deleted_at', {
+      withTimezone: true,
+      mode: 'date',
+    }),
+  },
+  (table) => [index('bookmark_cursor_idx').on(table.cursor)],
+);
 
 export const bookmarkRelations = relations(bookmark, ({ one, many }) => ({
   owner: one(user, {

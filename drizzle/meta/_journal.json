@@ -50,6 +50,13 @@
       "when": 1738182115424,
       "tag": "0006_vengeful_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1738311926906,
+      "tag": "0007_dapper_oracle",
+      "breakpoints": true
     }
   ]
 }
