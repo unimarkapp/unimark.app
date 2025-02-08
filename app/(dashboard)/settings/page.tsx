@@ -2,7 +2,6 @@ import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
 import { TagsManager } from '@/features/tags/manager';
 import { getSession } from '@/shared/auth/sessions';
-import { HydrateClient } from '@/trpc/server';
 import { redirect } from 'next/navigation';
 import { ThemeSwitcher } from '@/shared/ui/theme-switcher';
 
