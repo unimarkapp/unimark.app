@@ -2,12 +2,12 @@ services:
   server:
     build:
       context: .
-      dockerfile: ./apps/server/Dockerfile
+      dockerfile: Dockerfile
     container_name: unimark-server
     hostname: server
     restart: always
-    env_file:
-      - .env
+    environment:
+      DATABASE_URL: postgres://unimark:unimark@database:5432/unimark
     ports:
       - 3000:3000
     depends_on:
@@ -18,7 +18,9 @@ services:
     restart: always
     container_name: unimark-database
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: unimark
+      POSTGRES_USER: unimark
+      POSTGRES_PASSWORD: unimark
     ports:
       - 5432:5432
     volumes:

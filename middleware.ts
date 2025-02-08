@@ -1,22 +1,16 @@
-import { betterFetch } from '@better-fetch/fetch';
-import type { Session } from '@/shared/auth/server';
-import { NextResponse, type NextRequest } from 'next/server';
+import { getSessionCookie } from 'better-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
-const publicRoutes = ['/login', '/register'];
+const publicRoutes = ['/login'];
 
 export default async function authMiddleware(request: NextRequest) {
   if (publicRoutes.some((route) => route === request.nextUrl.pathname)) {
     return NextResponse.next();
   }
 
-  const { data: session } = await betterFetch<Session>('/api/auth/get-session', {
-    baseURL: request.nextUrl.origin,
-    headers: {
-      cookie: request.headers.get('cookie') || '',
-    },
-  });
+  const cookies = getSessionCookie(request);
 
-  if (!session) {
+  if (!cookies) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

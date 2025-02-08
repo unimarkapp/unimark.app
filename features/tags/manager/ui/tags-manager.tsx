@@ -7,7 +7,7 @@ import { ScrollArea } from '@/shared/ui/scroll-area';
 
 export function TagsManager() {
   const utils = api.useUtils();
-  const [tags] = api.tag.list.useSuspenseQuery();
+  const { data: tags } = api.tag.list.useQuery();
   const mutation = api.tag.delete.useMutation({
     onSuccess: () => {
       utils.tag.list.invalidate();

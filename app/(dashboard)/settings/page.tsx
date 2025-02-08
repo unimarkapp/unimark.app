@@ -3,9 +3,13 @@ import { Separator } from '@/shared/ui/separator';
 import { TagsManager } from '@/features/tags/manager';
 import { getSession } from '@/shared/auth/sessions';
 import { HydrateClient } from '@/trpc/server';
+import { redirect } from 'next/navigation';
+import { ThemeSwitcher } from '@/shared/ui/theme-switcher';
 
 export default async function Settings() {
   const session = await getSession();
+
+  if (!session) redirect('/login');
 
   return (
     <div className="">
@@ -20,7 +24,7 @@ export default async function Settings() {
           </div>
 
           <div className="lg:col-span-8">
-            <Input defaultValue={session.data?.user?.email} readOnly className="max-w-md" />
+            <Input defaultValue={session?.user?.email} readOnly className="max-w-md" />
           </div>
         </div>
 
@@ -34,7 +38,9 @@ export default async function Settings() {
             </p>
           </div>
 
-          <div className="lg:col-span-8">{/* <ThemeSwitcher /> */}</div>
+          <div className="lg:col-span-8">
+            <ThemeSwitcher />
+          </div>
         </div>
 
         <Separator className="my-8" />
@@ -46,9 +52,7 @@ export default async function Settings() {
           </div>
 
           <div className="lg:col-span-8">
-            <HydrateClient>
-              <TagsManager />
-            </HydrateClient>
+            <TagsManager />
           </div>
         </div>
       </div>

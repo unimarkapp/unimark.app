@@ -4,12 +4,11 @@ import {
   text,
   timestamp,
   boolean,
-  primaryKey,
   serial,
   unique,
   index,
+  uuid,
 } from 'drizzle-orm/pg-core';
-import { generateId } from 'lucia';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -29,29 +28,33 @@ export const user = pgTable('user', {
   }),
 });
 
-export const session = pgTable('session', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  token: text('token').notNull().unique(),
-  expiresAt: timestamp('expires_at', {
-    withTimezone: true,
-    mode: 'date',
-  }).notNull(),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  createdAt: timestamp('created_at', {
-    withTimezone: true,
-    mode: 'date',
-  })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', {
-    withTimezone: true,
-    mode: 'date',
-  }),
-});
+export const session = pgTable(
+  'session',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    token: text('token').notNull().unique(),
+    expiresAt: timestamp('expires_at', {
+      withTimezone: true,
+      mode: 'date',
+    }).notNull(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    createdAt: timestamp('created_at', {
+      withTimezone: true,
+      mode: 'date',
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', {
+      withTimezone: true,
+      mode: 'date',
+    }),
+  },
+  (table) => [index('token_idx').on(table.token)],
+);
 
 export const account = pgTable(
   'account',
@@ -122,9 +125,7 @@ export const verification = pgTable(
 export const bookmark = pgTable(
   'bookmark',
   {
-    id: text('id')
-      .primaryKey()
-      .$defaultFn(() => generateId(15)),
+    id: uuid('id').primaryKey().defaultRandom(),
     title: text('title').notNull(),
     url: text('url').notNull(),
     description: text('description'),
@@ -163,9 +164,7 @@ export const bookmarkRelations = relations(bookmark, ({ one, many }) => ({
 export const tag = pgTable(
   'tag',
   {
-    id: text('id')
-      .primaryKey()
-      .$defaultFn(() => generateId(15)),
+    id: uuid('id').primaryKey().defaultRandom(),
     name: text('name').notNull(),
     ownerId: text('owner_id')
       .notNull()
@@ -176,20 +175,16 @@ export const tag = pgTable(
   }),
 );
 
-export const bookmarkTag = pgTable(
-  'bookmarks_tags',
-  {
-    bookmarkId: text('bookmark_id')
-      .notNull()
-      .references(() => bookmark.id, { onDelete: 'cascade' }),
-    tagId: text('tag_id')
-      .notNull()
-      .references(() => tag.id, { onDelete: 'cascade' }),
-  },
-  (t) => ({ pk: primaryKey({ columns: [t.bookmarkId, t.tagId] }) }),
-);
+export const bookmarkTag = pgTable('bookmark_tag', {
+  bookmarkId: uuid('bookmark_id')
+    .notNull()
+    .references(() => bookmark.id, { onDelete: 'cascade' }),
+  tagId: uuid('tag_id')
+    .notNull()
+    .references(() => tag.id, { onDelete: 'cascade' }),
+});
 
-export const tagsRelations = relations(tag, ({ many }) => ({
+export const tagRelations = relations(tag, ({ many }) => ({
   bookmarks: many(bookmarkTag),
 }));
 

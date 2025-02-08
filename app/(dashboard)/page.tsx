@@ -1,23 +1,32 @@
-import { BookmarksGrid } from '@/widgets/bookmark/bookmarks-grid';
-import { HydrateClient, api } from '@/trpc/server';
+import { getSession } from '@/shared/auth/sessions';
+import { api, HydrateClient } from '@/trpc/server';
+import { BookmarkGridSkeleton, BookmarksGrid } from '@/widgets/bookmark/bookmarks-grid';
+import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ query?: string; tags?: string }>;
-}) {
-  const { query = null, tags = null } = await searchParams;
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-  await api.bookmark.list.prefetchInfinite({
-    query,
-    tags: tags?.split(',') ?? null,
+export default async function HomePage(props: { searchParams: SearchParams }) {
+  const session = await getSession();
+
+  if (!session) {
+    redirect('/login');
+  }
+
+  const searchParams = await props.searchParams;
+  const query = searchParams.query ?? null;
+  const tags = searchParams.tags ?? null;
+
+  api.bookmark.list.prefetchInfinite({
+    query: Array.isArray(query) ? query.join(',') : query,
+    tags: typeof tags === 'string' ? [tags] : tags,
   });
 
   return (
-    <div className="space-y-8">
-      <HydrateClient>
+    <HydrateClient>
+      <Suspense fallback={<BookmarkGridSkeleton />}>
         <BookmarksGrid />
-      </HydrateClient>
-    </div>
+      </Suspense>
+    </HydrateClient>
   );
 }

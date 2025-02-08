@@ -1,8 +1,17 @@
+'use client';
+
+import { authClient } from '@/shared/auth/client';
 import { Button } from '@/shared/ui/button';
 
 export function LoginWithGithubButton() {
+  const signIn = async () => {
+    await authClient.signIn.social({
+      provider: 'github',
+      callbackURL: '/',
+    });
+  };
   return (
-    <Button variant="outline">
+    <Button variant="outline" onClick={signIn}>
       <span className="pointer-events-none me-2">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={16} height={16}>
           <path

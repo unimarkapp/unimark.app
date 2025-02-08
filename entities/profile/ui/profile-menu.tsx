@@ -9,10 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { Button } from '@/shared/ui/button';
 import Link from 'next/link';
 import {
-  ChevronsUpDown,
+  ChevronDownIcon,
   Github,
   LayoutDashboard,
   LifeBuoy,
@@ -40,14 +41,24 @@ export function ProfileMenu({ user }: { user?: User }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="h-8 w-full gap-2" variant="outline">
-          <span className="h-4 w-4 shrink-0 rounded-full bg-gradient-to-bl from-blue-500 to-blue-100"></span>
-          <span className="hidden max-w-20 truncate md:inline-block">{user?.email}</span>
-          <ChevronsUpDown className="h-4 w-4" />
+        <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
+            <AvatarFallback>{user?.name?.[0]}</AvatarFallback>
+          </Avatar>
+          <ChevronDownIcon
+            size={16}
+            strokeWidth={2}
+            className="ms-1 opacity-60"
+            aria-hidden="true"
+          />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Settings</DropdownMenuLabel>
+      <DropdownMenuContent className="w-44" align="end">
+        <DropdownMenuLabel className="flex min-w-0 flex-col">
+          <span className="truncate text-sm font-medium text-foreground">{user?.name}</span>
+          <span className="truncate text-xs font-normal text-muted-foreground">{user?.email}</span>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>

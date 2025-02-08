@@ -14,7 +14,7 @@ export function SearchToolbar({ className }: { className?: string }) {
   const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
   const [term, setTerm] = useState<string>(query ?? '');
 
-  const [tags] = api.tag.list.useSuspenseQuery();
+  const { data: tags } = api.tag.list.useQuery();
 
   function reset() {
     setTerm('');
@@ -31,7 +31,7 @@ export function SearchToolbar({ className }: { className?: string }) {
           <X className="ml-2 h-4 w-4" />
         </Button>
       ) : null}
-      {tags ? <TagsFilter tags={tags} /> : null}
+      <TagsFilter tags={tags ?? []} />
     </div>
   );
 }
