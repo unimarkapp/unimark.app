@@ -1,13 +1,14 @@
 'use client';
 
-import { X } from 'lucide-react';
-import { SearchInput } from './search-input';
+import { SearchIcon, X } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { useState } from 'react';
 import { cn } from '@/shared/lib';
 import { TagsFilter } from './tags-filter';
 import { api } from '@/trpc/react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
+import { Input } from '@/shared/ui/input';
+import { useDebouncedCallback } from 'use-debounce';
 
 export function SearchToolbar({ className }: { className?: string }) {
   const [query, setQuery] = useQueryState('query', parseAsString);
@@ -15,6 +16,14 @@ export function SearchToolbar({ className }: { className?: string }) {
   const [term, setTerm] = useState<string>(query ?? '');
 
   const { data: tags } = api.tag.list.useQuery();
+
+  const debouncedSetSearchParams = useDebouncedCallback(setQuery, 500);
+
+  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
+    debouncedSetSearchParams(event.target.value);
+
+    setTerm(event.target.value);
+  }
 
   function reset() {
     setTerm('');
@@ -24,7 +33,19 @@ export function SearchToolbar({ className }: { className?: string }) {
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <SearchInput value={term} onChangeValue={setTerm} />
+      <div className="relative w-full">
+        <label htmlFor="global-search" hidden>
+          search
+        </label>
+        <Input
+          id="global-search"
+          value={term}
+          onChange={onChange}
+          placeholder="Search..."
+          className="h-8 border-transparent bg-muted pl-8 shadow-none focus:bg-transparent lg:w-96"
+        />
+        <SearchIcon className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+      </div>
       {(queryTags && queryTags?.length) || (query && query.length) ? (
         <Button variant="ghost" onClick={() => reset()} className="h-8 px-2 lg:px-3">
           Reset
