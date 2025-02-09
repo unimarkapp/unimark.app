@@ -20,7 +20,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
   const utils = api.useUtils();
   const [term, setTerm] = useState('');
 
-  const [tags] = api.tag.list.useSuspenseQuery();
+  const { data: tags } = api.tag.list.useQuery();
 
   const createAndTag = api.tag.createAndTag.useMutation({
     onSuccess(tag) {

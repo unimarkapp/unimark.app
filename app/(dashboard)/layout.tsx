@@ -5,7 +5,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <div className="flex min-h-svh flex-col">
       <Header />
-      <div className="space-y-8 p-4 md:p-8">{children}</div>
+      <div className="p-4 md:p-8">{children}</div>
     </div>
   );
 }
