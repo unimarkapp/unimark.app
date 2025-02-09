@@ -33,8 +33,7 @@ export function BookmarksGrid() {
     },
   );
 
-  const { fetchNextPage, error, isLoading, isRefetching, hasNextPage, isFetchingNextPage } =
-    bookmarkListQuery;
+  const { fetchNextPage, error, isRefetching, hasNextPage, isFetchingNextPage } = bookmarkListQuery;
 
   const openModal = useCallback((name: 'edit' | 'delete', bookmarkId: string) => {
     setSelectedBookmarkId(bookmarkId);
@@ -74,7 +73,6 @@ export function BookmarksGrid() {
   return (
     <div>
       {error && <div>{error.message}</div>}
-      {isLoading && <Loading />}
       {data?.pages[0] && data?.pages[0].bookmarks.length === 0 && <Empty />}
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {bookmarks.map((bookmark) => (
@@ -109,16 +107,6 @@ export function BookmarksGrid() {
         open={deleteModalOpen}
         onCloseModal={() => setDeleteModalOpen(false)}
       />
-    </div>
-  );
-}
-
-function Loading() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-      {Array.from({ length: 16 }).map((_, i) => (
-        <div className="animate-pulse rounded-lg bg-muted [aspect-ratio:1.1/1]" key={i}></div>
-      ))}
     </div>
   );
 }

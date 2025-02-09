@@ -6,10 +6,11 @@ import {
   inArray,
   isNotNull,
   isNull,
-  lt,
   countDistinct,
   getTableColumns,
   sql,
+  or,
+  lt,
 } from 'drizzle-orm';
 import { db } from '@/database';
 import { bookmark, bookmarkTag, tag } from '@/database/schema';
@@ -34,7 +35,12 @@ export const bookmarksRouter = {
         tags: z.array(z.string()).nullable(),
         deleted: z.boolean().optional(),
         limit: z.number().min(1).max(100).default(25),
-        cursor: z.number().nullish(),
+        cursor: z
+          .object({
+            id: z.string(),
+            createdAt: z.date(),
+          })
+          .optional(),
       }),
     )
     .query(
@@ -69,7 +75,15 @@ export const bookmarksRouter = {
                     eq(bookmark.ownerId, user.id),
                     input.query ? ilike(bookmark.title, `%${input.query}%`) : undefined,
                     input.tags?.length ? inArray(tag.name, input.tags) : undefined,
-                    input.cursor ? lt(bookmark.cursor, input.cursor) : undefined,
+                    input.cursor
+                      ? or(
+                          lt(bookmark.createdAt, input.cursor.createdAt),
+                          and(
+                            eq(bookmark.createdAt, input.cursor.createdAt),
+                            lt(bookmark.id, input.cursor.id),
+                          ),
+                        )
+                      : undefined,
                     input.deleted ? isNotNull(bookmark.deletedAt) : isNull(bookmark.deletedAt),
                   ),
                 )
@@ -80,12 +94,15 @@ export const bookmarksRouter = {
             ),
           )
           .limit(input.limit + 1)
-          .orderBy(desc(bookmark.cursor))
+          .orderBy(desc(bookmark.createdAt), desc(bookmark.id))
           .groupBy(bookmark.id);
 
         let nextCursor = null;
         if (list.length > input.limit) {
-          nextCursor = list[list.length - 2].cursor;
+          nextCursor = {
+            id: list[list.length - 2].id,
+            createdAt: list[list.length - 2].createdAt,
+          };
           list.pop();
         }
 

@@ -150,7 +150,10 @@ export const bookmark = pgTable(
       mode: 'date',
     }),
   },
-  (table) => [index('bookmark_cursor_idx').on(table.cursor)],
+  (table) => [
+    index('bookmark_cursor_idx').on(table.cursor),
+    index('bookmark_created_at_idx').on(table.createdAt),
+  ],
 );
 
 export const bookmarkRelations = relations(bookmark, ({ one, many }) => ({
