@@ -7,7 +7,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "start": "bun db:migrate && bun run server.js",
-    "lint": "turbo lint",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "dependencies": {

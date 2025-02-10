@@ -17,6 +17,7 @@ export function BookmarksGrid() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
+  const utils = api.useUtils();
   const [ref, entry] = useIntersectionObserver({
     threshold: 1,
     root: null,
@@ -57,6 +58,39 @@ export function BookmarksGrid() {
     [copyToClipboard],
   );
 
+  const regenerate = api.bookmark.regenerate.useMutation({
+    onSuccess(updatedBookmark) {
+      utils.bookmark.list.setInfiniteData(
+        {
+          query,
+          tags,
+        },
+        (data) => {
+          if (data?.pages) {
+            return {
+              ...data,
+              pages: data.pages.map((page) => ({
+                ...page,
+                bookmarks: page.bookmarks.map((bookmark) =>
+                  bookmark.id === updatedBookmark.id
+                    ? { ...updatedBookmark, tags: bookmark.tags }
+                    : bookmark,
+                ),
+              })),
+            };
+          }
+        },
+      );
+    },
+  });
+
+  const onRegenerate = useCallback(
+    async (url: string, id: string) => {
+      regenerate.mutate({ url, id });
+    },
+    [regenerate],
+  );
+
   useEffect(() => {
     if (
       entry?.isIntersecting &&
@@ -88,6 +122,7 @@ export function BookmarksGrid() {
             openModal={openModal}
             tags={bookmark.tags}
             onCopyUrl={onCopyUrl}
+            onRegenerate={onRegenerate}
           />
         ))}
       </ul>

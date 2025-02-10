@@ -198,6 +198,19 @@ export const bookmarksRouter = {
     const data = await parser(input.url);
     return data;
   }),
+  regenerate: protectedProcedure
+    .input(z.object({ url: z.string(), id: z.string() }))
+    .mutation(async ({ input }) => {
+      const data = await parser(input.url);
+
+      const [updatedBookmark] = await db
+        .update(bookmark)
+        .set(data)
+        .where(eq(bookmark.id, input.id))
+        .returning();
+
+      return updatedBookmark;
+    }),
   tag: protectedProcedure
     .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
     .mutation(async ({ input }) => {

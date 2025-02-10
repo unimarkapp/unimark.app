@@ -25,8 +25,6 @@ export async function parser(url: string) {
     const document = parse(html);
     const metadata = parseMetadata(document);
 
-    console.log('#PARSER#', { metadata });
-
     return createMetadata(metadata, document, url);
   } catch {
     return createEmptyMetadata();

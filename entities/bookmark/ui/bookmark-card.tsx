@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { forwardRef, memo } from 'react';
-import { FilePenLine, Files, ImageOff, MoreHorizontal, Trash2 } from 'lucide-react';
+import { FilePenLine, Files, ImageOff, MoreHorizontal, Sparkles, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,11 +22,15 @@ interface Props {
   tags: { id: string; name: string }[];
   openModal: (name: 'edit' | 'delete', bookmarkId: string) => void;
   onCopyUrl: (url: string) => void;
+  onRegenerate: (url: string, id: string) => void;
   footer?: ReactNode;
 }
 
 const Card = forwardRef<HTMLLIElement, Props>(
-  ({ id, url, cover, favicon, title, description, openModal, tags, onCopyUrl }, forwardRef) => {
+  (
+    { id, url, cover, favicon, title, description, openModal, tags, onCopyUrl, onRegenerate },
+    forwardRef,
+  ) => {
     return (
       <li key={id} ref={forwardRef}>
         <div className="relative flex h-full flex-col justify-between gap-2 rounded-lg border p-4 shadow-sm">
@@ -47,6 +51,10 @@ const Card = forwardRef<HTMLLIElement, Props>(
                     <DropdownMenuItem className="gap-2" onClick={() => openModal('edit', id)}>
                       <FilePenLine className="h-4 w-4 text-muted-foreground" />
                       Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2" onClick={() => onRegenerate(url, id)}>
+                      <Sparkles className="h-4 w-4 text-muted-foreground" />
+                      Regenerate
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
