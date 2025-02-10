@@ -16,7 +16,7 @@ interface Props {
 
 export function BookmarkTags({ id, tags: selected }: Props) {
   const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
-  const [query, setQuery] = useQueryState('query', parseAsString);
+  const [query] = useQueryState('query', parseAsString);
   const utils = api.useUtils();
   const [term, setTerm] = useState('');
 
@@ -50,7 +50,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         },
       );
 
-      setQuery('');
+      setTerm('');
     },
   });
   const assign = api.bookmark.tag.useMutation();
@@ -168,7 +168,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
                   >
                     <div className="flex items-center gap-2">
                       <PlusCircle className="-mb-px h-4 w-4 shrink-0 text-muted-foreground" />
-                      <span>{query}</span>
+                      <span>{term}</span>
                     </div>
                   </CommandItem>
                 </CommandGroup>
