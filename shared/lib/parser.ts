@@ -1,18 +1,18 @@
-import { parse } from "node-html-parser";
-import z from "zod";
+import { parse } from 'node-html-parser';
+import z from 'zod';
 
 const META_TAGS = [
-  "title",
-  "description",
-  "icon",
-  "shortcut icon",
-  "apple-touch-icon",
-  "og:title",
-  "og:description",
-  "og:image",
-  "twitter:title",
-  "twitter:description",
-  "twitter:image",
+  'title',
+  'description',
+  'icon',
+  'shortcut icon',
+  'apple-touch-icon',
+  'og:title',
+  'og:description',
+  'og:image',
+  'twitter:title',
+  'twitter:description',
+  'twitter:image',
 ];
 
 export async function parser(url: string) {
@@ -25,6 +25,8 @@ export async function parser(url: string) {
     const document = parse(html);
     const metadata = parseMetadata(document);
 
+    console.log('#PARSER#', { metadata });
+
     return createMetadata(metadata, document, url);
   } catch {
     return createEmptyMetadata();
@@ -34,8 +36,8 @@ export async function parser(url: string) {
 async function fetchHTML(url: string) {
   const response = await fetch(url, {
     headers: {
-      "Content-Type": "text/html",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      'Content-Type': 'text/html',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
     },
   });
 
@@ -45,14 +47,14 @@ async function fetchHTML(url: string) {
 function parseMetadata(document: ReturnType<typeof parse>) {
   const metadata: Record<string, string> = {};
 
-  document.querySelectorAll("meta").forEach(({ attributes }) => {
+  document.querySelectorAll('meta').forEach(({ attributes }) => {
     const property = attributes.property || attributes.name || attributes.href;
     if (!metadata[property] && META_TAGS.includes(property)) {
       metadata[property] = attributes.content;
     }
   });
 
-  document.querySelectorAll("link").forEach(({ attributes }) => {
+  document.querySelectorAll('link').forEach(({ attributes }) => {
     const { rel, href } = attributes;
     if (rel && href && META_TAGS.includes(rel)) {
       metadata[rel] = href;
@@ -65,16 +67,15 @@ function parseMetadata(document: ReturnType<typeof parse>) {
 function createMetadata(
   metadata: Record<string, string>,
   document: ReturnType<typeof parse>,
-  url: string
+  url: string,
 ) {
   const title =
-    metadata["og:title"] ||
-    metadata["twitter:title"] ||
-    document.querySelector("title")?.innerText ||
+    metadata['og:title'] ||
+    metadata['twitter:title'] ||
+    document.querySelector('title')?.innerText ||
     url;
 
-  const description =
-    metadata["og:description"] || metadata["description"] || "";
+  const description = metadata['og:description'] || metadata['description'] || '';
 
   const cover = getCover(metadata);
 
@@ -83,35 +84,35 @@ function createMetadata(
   return {
     title,
     description,
-    favicon: favicon ? generateFaviconURL(url, favicon) : "",
-    cover: cover || "",
+    favicon: favicon ? generateMediaURL(url, favicon) : '',
+    cover: cover ? generateMediaURL(url, cover) : '',
   };
 }
 
 function getCover(metadata: Record<string, string>) {
-  return metadata["og:image"] || metadata["twitter:image"];
+  return metadata['og:image'] || metadata['twitter:image'];
 }
 
 function getFavIconImage(metadata: Record<string, string>) {
-  return (
-    metadata["apple-touch-icon"] ||
-    metadata["icon"] ||
-    metadata["shortcut icon"]
-  );
+  return metadata['apple-touch-icon'] || metadata['icon'] || metadata['shortcut icon'];
 }
 
 function createEmptyMetadata() {
-  return { title: "", description: "", cover: "", favicon: "" };
+  return { title: '', description: '', cover: '', favicon: '' };
 }
 
-function generateFaviconURL(url: string, faviconPath: string) {
-  const isFaviconPathURL = z.string().url().safeParse(faviconPath);
+function generateMediaURL(url: string, mediaPath: string) {
+  const isFaviconPathURL = z.string().url().safeParse(mediaPath);
 
   if (isFaviconPathURL.success) {
-    return faviconPath;
+    return mediaPath;
   }
 
   const { origin } = new URL(url);
 
-  return `${origin}${faviconPath}`;
+  return `${origin}/${normalizePath(mediaPath)}`;
+}
+
+function normalizePath(path: string) {
+  return path.replace(/^\/+/, '');
 }
