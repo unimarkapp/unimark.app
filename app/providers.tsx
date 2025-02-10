@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes';
 import type { ReactNode } from 'react';
 import { TRPCReactProvider } from '@/trpc/react';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Toaster } from '@/shared/ui/sonner';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <TRPCReactProvider>
         <NuqsAdapter>{children}</NuqsAdapter>
       </TRPCReactProvider>
+      <Toaster />
     </ThemeProvider>
   );
 }
