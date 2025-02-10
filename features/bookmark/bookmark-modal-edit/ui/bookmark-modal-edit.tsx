@@ -49,7 +49,6 @@ export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
   const update = api.bookmark.update.useMutation({
     onSuccess() {
       utils.bookmark.list.invalidate();
-      utils.stat.all.invalidate();
       onCloseModal();
       form.reset();
     },

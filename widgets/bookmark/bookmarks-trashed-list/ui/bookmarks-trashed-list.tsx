@@ -78,7 +78,6 @@ export function BookmarksTrashedList() {
       tags: searchParams.tags,
       deleted: true,
     });
-    await utils.stat.all.invalidate();
     setSelected(new Set());
   }
 

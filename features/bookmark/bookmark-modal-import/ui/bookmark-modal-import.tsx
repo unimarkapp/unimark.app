@@ -29,7 +29,6 @@ export function BookmarkModalImport() {
   const create = api.bookmark.import.useMutation({
     onSuccess() {
       utils.bookmark.list.invalidate();
-      utils.stat.all.invalidate();
       setOpen(false);
       form.reset();
     },

@@ -44,7 +44,6 @@ export function BookmarkModalAdd() {
   const create = api.bookmark.create.useMutation({
     onSuccess() {
       utils.bookmark.list.invalidate();
-      utils.stat.all.invalidate();
       setOpen(false);
       parse.reset();
       form.reset();
@@ -71,8 +70,8 @@ export function BookmarkModalAdd() {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="shrink-0 h-8 w-8" size="icon">
-          <PlusIcon className="w-4 h-4" />
+        <Button className="h-8 w-8 shrink-0" size="icon">
+          <PlusIcon className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-5xl">

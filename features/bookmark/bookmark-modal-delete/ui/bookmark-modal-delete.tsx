@@ -21,7 +21,6 @@ export function BookmarkModalDelete({ open, bookmarkId, onCloseModal }: Props) {
 
   const remove = api.bookmark.moveToTrash.useMutation({
     onSuccess: async () => {
-      await utils.stat.all.invalidate();
       await utils.bookmark.list.invalidate();
 
       onCloseModal();
