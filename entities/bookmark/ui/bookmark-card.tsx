@@ -1,6 +1,14 @@
 import type { ReactNode } from 'react';
 import { forwardRef, memo } from 'react';
-import { FilePenLine, Files, ImageOff, MoreHorizontal, Sparkles, Trash2 } from 'lucide-react';
+import {
+  FilePenLine,
+  Files,
+  ImageOff,
+  Loader2Icon,
+  MoreHorizontal,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,12 +31,25 @@ interface Props {
   openModal: (name: 'edit' | 'delete', bookmarkId: string) => void;
   onCopyUrl: (url: string) => void;
   onRegenerate: (url: string, id: string) => void;
+  isLoading?: boolean;
   footer?: ReactNode;
 }
 
 const Card = forwardRef<HTMLLIElement, Props>(
   (
-    { id, url, cover, favicon, title, description, openModal, tags, onCopyUrl, onRegenerate },
+    {
+      id,
+      url,
+      cover,
+      favicon,
+      title,
+      description,
+      openModal,
+      tags,
+      onCopyUrl,
+      onRegenerate,
+      isLoading,
+    },
     forwardRef,
   ) => {
     return (
@@ -70,7 +91,9 @@ const Card = forwardRef<HTMLLIElement, Props>(
               target="_blank"
               className="flex aspect-video items-center justify-center rounded-md border border-border/75 bg-muted/25"
             >
-              {cover ? (
+              {isLoading ? (
+                <Loader2Icon className="animate-spin" />
+              ) : cover ? (
                 <img
                   src={cover}
                   loading="lazy"

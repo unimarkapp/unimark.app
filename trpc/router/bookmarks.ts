@@ -188,7 +188,7 @@ export const bookmarksRouter = {
     .mutation(async ({ input }) => {
       const [updatedBookmark] = await db
         .update(bookmark)
-        .set(input)
+        .set({ ...input, updatedAt: new Date() })
         .where(eq(bookmark.id, input.id))
         .returning();
 
@@ -205,7 +205,7 @@ export const bookmarksRouter = {
 
       const [updatedBookmark] = await db
         .update(bookmark)
-        .set(data)
+        .set({ ...data, updatedAt: new Date() })
         .where(eq(bookmark.id, input.id))
         .returning();
 

@@ -81,11 +81,13 @@ export function BookmarksGrid() {
           }
         },
       );
+      toast.success(`Bookmark's metadata was updated.`);
     },
   });
 
   const onRegenerate = useCallback(
     async (url: string, id: string) => {
+      setSelectedBookmarkId(id);
       regenerate.mutate({ url, id });
     },
     [regenerate],
@@ -121,6 +123,7 @@ export function BookmarksGrid() {
             favicon={bookmark.favicon}
             openModal={openModal}
             tags={bookmark.tags}
+            isLoading={bookmark.id === selectedBookmarkId && regenerate.isPending}
             onCopyUrl={onCopyUrl}
             onRegenerate={onRegenerate}
           />
