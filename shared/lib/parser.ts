@@ -1,5 +1,4 @@
 import { parse } from 'node-html-parser';
-import z from 'zod';
 
 const META_TAGS = [
   'title',
@@ -100,17 +99,5 @@ function createEmptyMetadata() {
 }
 
 function generateMediaURL(url: string, mediaPath: string) {
-  const isFaviconPathURL = z.string().url().safeParse(mediaPath);
-
-  if (isFaviconPathURL.success) {
-    return mediaPath;
-  }
-
-  const { origin } = new URL(url);
-
-  return `${origin}/${normalizePath(mediaPath)}`;
-}
-
-function normalizePath(path: string) {
-  return path.replace(/^\/+/, '');
+  return new URL(mediaPath, url).toString();
 }
