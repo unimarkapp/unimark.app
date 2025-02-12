@@ -1,4 +1,5 @@
 -- Custom SQL migration file, put your code below! --
+-- Step 1: Check all users if they don't have organizations, then create one with slug: 'default'
 DO $$
 DECLARE
     user_record RECORD;

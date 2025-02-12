@@ -1,0 +1,1 @@
+CREATE INDEX "bookmark_created_at_idx" ON "bookmark" USING btree ("created_at");
