@@ -9,13 +9,13 @@ BEGIN
         -- Check if the user has any organizations
         IF NOT EXISTS (SELECT 1 FROM member WHERE user_id = user_record.id) THEN
             -- Create a default organization for the user
-            INSERT INTO organization (id, name, slug, created_at)
-            VALUES (gen_random_uuid(), 'Default Organization', 'default', NOW())
+            INSERT INTO organization (id, name, slug, 'default', created_at)
+            VALUES (gen_random_uuid(), 'Personal', 'personal', TRUE, NOW())
             RETURNING id INTO default_org_id;
 
             -- Step 2: Insert row in member table with organization_id, user_id, role - owner
-            INSERT INTO member (organization_id, user_id, role, created_at)
-            VALUES (default_org_id, user_record.id, 'owner', NOW());
+            INSERT INTO member (id, organization_id, user_id, role, created_at)
+            VALUES (gen_random_uuid(), default_org_id, user_record.id, 'owner', NOW());
         END IF;
     END LOOP;
 END $$;
