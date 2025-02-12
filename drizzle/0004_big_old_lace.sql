@@ -31,7 +31,7 @@ BEGIN
         SELECT o.id INTO default_org_id
         FROM organization o
         JOIN member m ON o.id = m.organization_id
-        WHERE m.user_id = user_record.id AND o.slug = 'default';
+        WHERE m.user_id = user_record.id AND o."default" = TRUE;
 
         -- Update all bookmarks for the user that don't have an organization_id set
         UPDATE bookmark
