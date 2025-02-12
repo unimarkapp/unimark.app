@@ -9,8 +9,10 @@ import { BookmarkModalDelete } from '@/features/bookmark/bookmark-modal-delete';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FetchingIndicator } from '@/shared/ui/fetching-indicator';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
+import { useParams } from 'next/navigation';
 
 export function BookmarksGrid() {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const [tags] = useQueryState('tags', parseAsArrayOf(parseAsString));
   const [query] = useQueryState('query', parseAsString);
   const [selectedBookmarkId, setSelectedBookmarkId] = useState<string>();
@@ -24,10 +26,13 @@ export function BookmarksGrid() {
     rootMargin: '0px',
   });
 
+  const { data: workspaces } = api.workspace.list.useQuery();
+
   const [data, bookmarkListQuery] = api.bookmark.list.useSuspenseInfiniteQuery(
     {
       query,
       tags,
+      organizationId,
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -64,6 +69,7 @@ export function BookmarksGrid() {
         {
           query,
           tags,
+          organizationId,
         },
         (data) => {
           if (data?.pages) {

@@ -7,47 +7,53 @@ import { bookmarkTag, tag } from '@/database/schema';
 const tagNameSchema = z.string().min(2, 'Tag name must be at least 2 characters');
 
 export const tagsRouter = {
-  list: protectedProcedure.input(z.object({ query: z.string().optional() }).optional()).query(
-    async ({
-      ctx: {
-        session: { user },
-      },
-    }) => {
-      const list = await db
-        .select({
-          id: tag.id,
-          name: tag.name,
-          count: sql<number>`count(${bookmarkTag.bookmarkId})`,
-        })
-        .from(tag)
-        .where(eq(tag.ownerId, user.id))
-        .leftJoin(bookmarkTag, and(eq(bookmarkTag.tagId, tag.id)))
-        .groupBy(tag.id)
-        .orderBy(desc(sql`count`));
+  list: protectedProcedure
+    .input(z.object({ query: z.string().optional(), organizationId: z.string() }))
+    .query(
+      async ({
+        ctx: {
+          session: { user },
+        },
+        input,
+      }) => {
+        const list = await db
+          .select({
+            id: tag.id,
+            name: tag.name,
+            count: sql<number>`count(${bookmarkTag.bookmarkId})`,
+          })
+          .from(tag)
+          .where(and(eq(tag.ownerId, user.id), eq(tag.organizationId, input.organizationId)))
+          .leftJoin(bookmarkTag, and(eq(bookmarkTag.tagId, tag.id)))
+          .groupBy(tag.id)
+          .orderBy(desc(sql`count`));
 
-      return list;
-    },
-  ),
-  create: protectedProcedure.input(tagNameSchema).mutation(
-    async ({
-      ctx: {
-        session: { user },
+        return list;
       },
-      input,
-    }) => {
-      const [createdTag] = await db
-        .insert(tag)
-        .values({ name: input, ownerId: user.id })
-        .returning({ id: tag.id, name: tag.name });
+    ),
+  create: protectedProcedure
+    .input(z.object({ name: tagNameSchema, organizationId: z.string() }))
+    .mutation(
+      async ({
+        ctx: {
+          session: { user },
+        },
+        input,
+      }) => {
+        const [createdTag] = await db
+          .insert(tag)
+          .values({ name: input.name, ownerId: user.id, organizationId: input.organizationId })
+          .returning({ id: tag.id, name: tag.name });
 
-      return createdTag;
-    },
-  ),
+        return createdTag;
+      },
+    ),
   createAndTag: protectedProcedure
     .input(
       z.object({
         name: tagNameSchema,
         bookmarkId: z.string(),
+        organizationId: z.string(),
       }),
     )
     .mutation(
@@ -59,7 +65,11 @@ export const tagsRouter = {
       }) => {
         const [createdTag] = await db
           .insert(tag)
-          .values({ name: input.name, ownerId: user.id })
+          .values({
+            name: input.name,
+            ownerId: user.id,
+            organizationId: input.organizationId,
+          })
           .returning({ id: tag.id, name: tag.name });
 
         await db.insert(bookmarkTag).values({ tagId: createdTag.id, bookmarkId: input.bookmarkId });

@@ -14,6 +14,7 @@ import {
 import { BookmarkForm, schema } from '@/entities/bookmark';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { useEffect, useMemo } from 'react';
+import { useParams } from 'next/navigation';
 
 interface Props {
   open: boolean;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const [query] = useQueryState('query', parseAsString);
   const [tags] = useQueryState('tags', parseAsArrayOf(parseAsString));
   const utils = api.useUtils();
@@ -29,6 +31,7 @@ export function BookmarkModalEdit({ open, bookmarkId, onCloseModal }: Props) {
   const bookmarksRawData = utils.bookmark.list.getInfiniteData({
     query,
     tags,
+    organizationId,
   });
   const bookmarks = useMemo(() => {
     return bookmarksRawData?.pages.flatMap((page) => page.bookmarks) ?? [];

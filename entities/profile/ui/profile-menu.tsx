@@ -22,10 +22,11 @@ import {
   UserIcon,
 } from 'lucide-react';
 import { authClient } from '@/shared/auth/client';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import type { User } from 'better-auth';
 
 export function ProfileMenu({ user }: { user?: User }) {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const router = useRouter();
 
   function signOut() {
@@ -62,19 +63,19 @@ export function ProfileMenu({ user }: { user?: User }) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/">
+            <Link href={`/${organizationId}`}>
               <LayoutDashboard className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Home</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/settings">
+            <Link href={`/${organizationId}/settings`}>
               <UserIcon className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Settings</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/trash">
+            <Link href={`/${organizationId}/trash`}>
               <Trash2Icon className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Trash</span>
             </Link>

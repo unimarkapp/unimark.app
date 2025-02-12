@@ -9,13 +9,15 @@ import { api } from '@/trpc/react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { Input } from '@/shared/ui/input';
 import { useDebouncedCallback } from 'use-debounce';
+import { useParams } from 'next/navigation';
 
 export function SearchToolbar({ className }: { className?: string }) {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const [query, setQuery] = useQueryState('query', parseAsString);
   const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
   const [term, setTerm] = useState<string>(query ?? '');
 
-  const { data: tags } = api.tag.list.useQuery();
+  const { data: tags } = api.tag.list.useQuery({ organizationId });
 
   const debouncedSetSearchParams = useDebouncedCallback(setQuery, 500);
 

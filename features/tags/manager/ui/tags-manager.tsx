@@ -4,10 +4,12 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { api } from '@/trpc/react';
 import { ScrollArea } from '@/shared/ui/scroll-area';
+import { useParams } from 'next/navigation';
 
 export function TagsManager() {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const utils = api.useUtils();
-  const { data: tags } = api.tag.list.useQuery();
+  const { data: tags } = api.tag.list.useQuery({ organizationId });
   const mutation = api.tag.delete.useMutation({
     onSuccess: () => {
       utils.tag.list.invalidate();

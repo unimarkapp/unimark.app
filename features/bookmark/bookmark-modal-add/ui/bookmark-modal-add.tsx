@@ -17,8 +17,10 @@ import {
 import { useState } from 'react';
 import { BookmarkForm, schema } from '@/entities/bookmark';
 import { PlusIcon } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 export function BookmarkModalAdd() {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const [open, setOpen] = useState(false);
   const utils = api.useUtils();
   const form = useForm<Form>({
@@ -29,6 +31,7 @@ export function BookmarkModalAdd() {
       description: '',
       cover: '',
       favicon: '',
+      organizationId,
     },
   });
 

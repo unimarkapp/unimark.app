@@ -25,6 +25,7 @@ const bookmarkInputSchema = z.object({
   cover: z.string().optional(),
   favicon: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  organizationId: z.string(),
 });
 
 export const bookmarksRouter = {
@@ -35,6 +36,7 @@ export const bookmarksRouter = {
         tags: z.array(z.string()).nullable(),
         deleted: z.boolean().optional(),
         limit: z.number().min(1).max(100).default(25),
+        organizationId: z.string(),
         cursor: z
           .object({
             id: z.string(),
@@ -72,7 +74,7 @@ export const bookmarksRouter = {
                 .leftJoin(tag, eq(bookmarkTag.tagId, tag.id))
                 .where(
                   and(
-                    eq(bookmark.ownerId, user.id),
+                    eq(bookmark.organizationId, input.organizationId),
                     input.query ? ilike(bookmark.title, `%${input.query}%`) : undefined,
                     input.tags?.length ? inArray(tag.name, input.tags) : undefined,
                     input.cursor
@@ -126,13 +128,19 @@ export const bookmarksRouter = {
 
       const [createdBookmark] = await db
         .insert(bookmark)
-        .values({ ...input, ownerId: user.id })
+        .values({ ...input, ownerId: user.id, organizationId: input.organizationId })
         .returning();
 
       if (tagsToAttach?.length) {
         const createdTags = await db
           .insert(tag)
-          .values(tagsToAttach.map((name) => ({ name, ownerId: user.id })))
+          .values(
+            tagsToAttach.map((name) => ({
+              name,
+              ownerId: user.id,
+              organizationId: input.organizationId,
+            })),
+          )
           .onConflictDoNothing()
           .returning();
 
@@ -242,6 +250,26 @@ export const bookmarksRouter = {
         .where(and(inArray(bookmark.id, input), eq(bookmark.ownerId, user.id)));
     },
   ),
+  moveToOrganization: protectedProcedure
+    .input(
+      z.object({
+        bookmarkId: z.string(),
+        fromOrganizationId: z.string(),
+        toOrganizationId: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      // TODO: add permission check
+      await ctx.db
+        .update(bookmark)
+        .set({ organizationId: input.toOrganizationId })
+        .where(
+          and(
+            eq(bookmark.id, input.bookmarkId),
+            eq(bookmark.organizationId, input.fromOrganizationId),
+          ),
+        );
+    }),
   moveToTrash: protectedProcedure.input(z.string()).mutation(
     async ({
       ctx: {

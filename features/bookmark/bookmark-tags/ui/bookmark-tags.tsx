@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { Tags, PlusCircle, Check } from 'lucide-react';
 import { useState } from 'react';
 import { useQueryState, parseAsArrayOf, parseAsString } from 'nuqs';
+import { useParams } from 'next/navigation';
 
 interface Props {
   id: string;
@@ -15,16 +16,17 @@ interface Props {
 }
 
 export function BookmarkTags({ id, tags: selected }: Props) {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
   const [query] = useQueryState('query', parseAsString);
   const utils = api.useUtils();
   const [term, setTerm] = useState('');
 
-  const { data: tags } = api.tag.list.useQuery();
+  const { data: tags } = api.tag.list.useQuery({ organizationId });
 
   const createAndTag = api.tag.createAndTag.useMutation({
     onSuccess(tag) {
-      utils.tag.list.setData(undefined, (data) => {
+      utils.tag.list.setData({ organizationId }, (data) => {
         if (data) {
           return [...data, { ...tag, count: 1 }];
         }
@@ -34,6 +36,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         {
           query,
           tags: queryTags,
+          organizationId,
         },
         (data) => {
           if (data?.pages) {
@@ -64,6 +67,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
         {
           query,
           tags: queryTags,
+          organizationId,
         },
         (data) => {
           if (data?.pages) {
@@ -92,6 +96,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
       {
         query,
         tags: queryTags,
+        organizationId,
       },
       (data) => {
         if (data) {
@@ -111,7 +116,7 @@ export function BookmarkTags({ id, tags: selected }: Props) {
   }
 
   function onCreate(tag: string) {
-    createAndTag.mutate({ name: tag, bookmarkId: id });
+    createAndTag.mutate({ name: tag, bookmarkId: id, organizationId });
   }
 
   return (

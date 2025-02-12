@@ -3,10 +3,12 @@ import { api } from '@/trpc/react';
 import { ScrollArea } from '@/shared/ui/scroll-area';
 import { Hash } from 'lucide-react';
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
+import { useParams } from 'next/navigation';
 
 export function TagsList() {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const [queryTags, setQueryTags] = useQueryState('tags', parseAsArrayOf(parseAsString));
-  const { data } = api.tag.list.useQuery();
+  const { data } = api.tag.list.useQuery({ organizationId });
 
   function handleClick(name: string) {
     setQueryTags((prev) => {

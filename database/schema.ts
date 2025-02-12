@@ -42,6 +42,7 @@ export const session = pgTable(
     }).notNull(),
     ipAddress: text('ip_address'),
     userAgent: text('user_agent'),
+    activeOrganizationId: text('active_organization_id'),
     createdAt: timestamp('created_at', {
       withTimezone: true,
       mode: 'date',
@@ -122,6 +123,42 @@ export const verification = pgTable(
   ],
 );
 
+export const organization = pgTable('organization', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  slug: text('slug').unique(),
+  logo: text('logo'),
+  default: boolean('default').default(false),
+  createdAt: timestamp('created_at').notNull(),
+  metadata: text('metadata'),
+});
+
+export const member = pgTable('member', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+});
+
+export const invitation = pgTable('invitation', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  email: text('email').notNull(),
+  role: text('role'),
+  status: text('status').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  inviterId: text('inviter_id')
+    .notNull()
+    .references(() => user.id),
+});
+
 export const bookmark = pgTable(
   'bookmark',
   {
@@ -134,6 +171,9 @@ export const bookmark = pgTable(
     ownerId: text('owner_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
     cursor: serial('cursor'),
     createdAt: timestamp('created_at', {
       withTimezone: true,
@@ -172,9 +212,12 @@ export const tag = pgTable(
     ownerId: text('owner_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
   },
   (table) => ({
-    unique_name: unique('unique_name').on(table.name, table.ownerId),
+    unique_name: unique('unique_name').on(table.name, table.organizationId),
   }),
 );
 

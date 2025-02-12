@@ -15,6 +15,62 @@
       "when": 1739084235082,
       "tag": "0001_steep_smiling_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1739243146520,
+      "tag": "0002_closed_bastion",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1739282040640,
+      "tag": "0004_watery_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1739282317920,
+      "tag": "0004_big_old_lace",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1739283682866,
+      "tag": "0005_opposite_mantis",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1739283767880,
+      "tag": "0006_aberrant_preak",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1739330058829,
+      "tag": "0007_shocking_talkback",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1739330185152,
+      "tag": "0008_ambitious_komodo",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1739330487021,
+      "tag": "0009_minor_mimic",
+      "breakpoints": true
     }
   ]
 }

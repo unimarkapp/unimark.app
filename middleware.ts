@@ -1,7 +1,7 @@
 import { getSessionCookie } from 'better-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-const publicRoutes = ['/login'];
+const publicRoutes = ['/login', '/register'];
 
 export default async function authMiddleware(request: NextRequest) {
   if (publicRoutes.some((route) => route === request.nextUrl.pathname)) {
