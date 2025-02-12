@@ -1,6 +1,6 @@
 -- Custom SQL migration file, put your code below! --
 -- Step 1: Add organization_id column to the tag table (nullable initially)
-ALTER TABLE tag ADD COLUMN organization_id text;
+ALTER TABLE "tag" ADD COLUMN organization_id text;
 
 -- Step 2: Set the default organization ID for existing rows
 DO $$
@@ -23,4 +23,6 @@ BEGIN
 END $$;
 
 -- Step 3: Add NOT NULL constraint to the organization_id column
-ALTER TABLE tag ALTER COLUMN organization_id SET NOT NULL;
+ALTER TABLE "tag" ALTER COLUMN "organization_id" SET NOT NULL;
+ALTER TABLE "tag" DROP CONSTRAINT "unique_name";
+ALTER TABLE "tag" ADD CONSTRAINT "unique_name" UNIQUE("name","organization_id");
