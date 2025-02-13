@@ -12,7 +12,6 @@ import {
   or,
   lt,
 } from 'drizzle-orm';
-import { db } from '@/database';
 import { bookmark, bookmarkTag, tag } from '@/database/schema';
 import { protectedProcedure } from '@/trpc/trpc';
 import { z } from 'zod';
@@ -45,82 +44,76 @@ export const bookmarksRouter = {
           .optional(),
       }),
     )
-    .query(
-      async ({
-        ctx: {
-          session: { user },
-        },
-        input,
-      }) => {
-        const list = await db
-          .select({
-            ...getTableColumns(bookmark),
-            tags: sql<
-              { id: string; name: string }[]
-            >`array_agg(json_build_object('id', ${tag.id}, 'name', ${tag.name}))`,
-          })
-          .from(bookmark)
-          .leftJoin(bookmarkTag, eq(bookmark.id, bookmarkTag.bookmarkId))
-          .leftJoin(tag, eq(bookmarkTag.tagId, tag.id))
-          .where(
-            inArray(
-              bookmark.id,
-              db
-                .select({
-                  id: bookmark.id,
-                })
-                .from(bookmark)
-                .leftJoin(bookmarkTag, eq(bookmark.id, bookmarkTag.bookmarkId))
-                .leftJoin(tag, eq(bookmarkTag.tagId, tag.id))
-                .where(
-                  and(
-                    eq(bookmark.organizationId, input.organizationId),
-                    input.query ? ilike(bookmark.title, `%${input.query}%`) : undefined,
-                    input.tags?.length ? inArray(tag.name, input.tags) : undefined,
-                    input.cursor
-                      ? or(
-                          lt(bookmark.createdAt, input.cursor.createdAt),
-                          and(
-                            eq(bookmark.createdAt, input.cursor.createdAt),
-                            lt(bookmark.id, input.cursor.id),
-                          ),
-                        )
-                      : undefined,
-                    input.deleted ? isNotNull(bookmark.deletedAt) : isNull(bookmark.deletedAt),
-                  ),
-                )
-                .groupBy(bookmark.id)
-                .having(
-                  input.tags?.length ? eq(countDistinct(tag.name), input.tags.length) : undefined,
+    .query(async ({ ctx: { db }, input }) => {
+      const list = await db
+        .select({
+          ...getTableColumns(bookmark),
+          tags: sql<
+            { id: string; name: string }[]
+          >`array_agg(json_build_object('id', ${tag.id}, 'name', ${tag.name}))`,
+        })
+        .from(bookmark)
+        .leftJoin(bookmarkTag, eq(bookmark.id, bookmarkTag.bookmarkId))
+        .leftJoin(tag, eq(bookmarkTag.tagId, tag.id))
+        .where(
+          inArray(
+            bookmark.id,
+            db
+              .select({
+                id: bookmark.id,
+              })
+              .from(bookmark)
+              .leftJoin(bookmarkTag, eq(bookmark.id, bookmarkTag.bookmarkId))
+              .leftJoin(tag, eq(bookmarkTag.tagId, tag.id))
+              .where(
+                and(
+                  eq(bookmark.organizationId, input.organizationId),
+                  input.query ? ilike(bookmark.title, `%${input.query}%`) : undefined,
+                  input.tags?.length ? inArray(tag.name, input.tags) : undefined,
+                  input.cursor
+                    ? or(
+                        lt(bookmark.createdAt, input.cursor.createdAt),
+                        and(
+                          eq(bookmark.createdAt, input.cursor.createdAt),
+                          lt(bookmark.id, input.cursor.id),
+                        ),
+                      )
+                    : undefined,
+                  input.deleted ? isNotNull(bookmark.deletedAt) : isNull(bookmark.deletedAt),
                 ),
-            ),
-          )
-          .limit(input.limit + 1)
-          .orderBy(desc(bookmark.createdAt), desc(bookmark.id))
-          .groupBy(bookmark.id);
+              )
+              .groupBy(bookmark.id)
+              .having(
+                input.tags?.length ? eq(countDistinct(tag.name), input.tags.length) : undefined,
+              ),
+          ),
+        )
+        .limit(input.limit + 1)
+        .orderBy(desc(bookmark.createdAt), desc(bookmark.id))
+        .groupBy(bookmark.id);
 
-        let nextCursor = null;
-        if (list.length > input.limit) {
-          nextCursor = {
-            id: list[list.length - 2].id,
-            createdAt: list[list.length - 2].createdAt,
-          };
-          list.pop();
-        }
-
-        return {
-          bookmarks: list.map((bookmark) => ({
-            ...bookmark,
-            tags: bookmark.tags.filter((tag) => tag.id && tag.name),
-          })),
-          nextCursor,
+      let nextCursor = null;
+      if (list.length > input.limit) {
+        nextCursor = {
+          id: list[list.length - 2].id,
+          createdAt: list[list.length - 2].createdAt,
         };
-      },
-    ),
+        list.pop();
+      }
+
+      return {
+        bookmarks: list.map((bookmark) => ({
+          ...bookmark,
+          tags: bookmark.tags.filter((tag) => tag.id && tag.name),
+        })),
+        nextCursor,
+      };
+    }),
   create: protectedProcedure.input(bookmarkInputSchema).mutation(
     async ({
       ctx: {
         session: { user },
+        db,
       },
       input,
     }) => {
@@ -174,26 +167,36 @@ export const bookmarksRouter = {
       return createdBookmark;
     },
   ),
-  import: protectedProcedure.input(z.array(z.object({ url: z.string() }))).mutation(
-    async ({
-      ctx: {
-        session: { user },
-      },
-      input,
-    }) => {
-      const importedBookmarks = await Promise.all(
-        input.map(async (bookmarkData) => {
-          const parsedBookmarkData = await parser(bookmarkData.url);
-          return { ...bookmarkData, ...parsedBookmarkData, ownerId: user.id };
-        }),
-      );
+  import: protectedProcedure
+    .input(
+      z.object({ bookmarks: z.array(z.object({ url: z.string() })), organizationId: z.string() }),
+    )
+    .mutation(
+      async ({
+        ctx: {
+          session: { user },
+          db,
+        },
+        input,
+      }) => {
+        const importedBookmarks = await Promise.all(
+          input.bookmarks.map(async (bookmarkData) => {
+            const parsedBookmarkData = await parser(bookmarkData.url);
+            return {
+              ...bookmarkData,
+              ...parsedBookmarkData,
+              ownerId: user.id,
+              organizationId: input.organizationId,
+            };
+          }),
+        );
 
-      await db.insert(bookmark).values(importedBookmarks).returning();
-    },
-  ),
+        await db.insert(bookmark).values(importedBookmarks).returning();
+      },
+    ),
   update: protectedProcedure
     .input(bookmarkInputSchema.extend({ id: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { db } }) => {
       const [updatedBookmark] = await db
         .update(bookmark)
         .set({ ...input, updatedAt: new Date() })
@@ -208,7 +211,7 @@ export const bookmarksRouter = {
   }),
   regenerate: protectedProcedure
     .input(z.object({ url: z.string(), id: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { db } }) => {
       const data = await parser(input.url);
 
       const [updatedBookmark] = await db
@@ -221,7 +224,7 @@ export const bookmarksRouter = {
     }),
   tag: protectedProcedure
     .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { db } }) => {
       const data = await db
         .insert(bookmarkTag)
         .values({ bookmarkId: input.bookmarkId, tagId: input.tagId });
@@ -230,7 +233,7 @@ export const bookmarksRouter = {
     }),
   untag: protectedProcedure
     .input(z.object({ bookmarkId: z.string(), tagId: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx: { db } }) => {
       await db
         .delete(bookmarkTag)
         .where(
@@ -241,6 +244,7 @@ export const bookmarksRouter = {
     async ({
       ctx: {
         session: { user },
+        db,
       },
       input,
     }) => {
@@ -274,6 +278,7 @@ export const bookmarksRouter = {
     async ({
       ctx: {
         session: { user },
+        db,
       },
       input,
     }) => {
@@ -287,6 +292,7 @@ export const bookmarksRouter = {
     async ({
       ctx: {
         session: { user },
+        db,
       },
       input,
     }) => {
@@ -299,6 +305,7 @@ export const bookmarksRouter = {
     async ({
       ctx: {
         session: { user },
+        db,
       },
     }) => {
       await db

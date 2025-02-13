@@ -15,8 +15,10 @@ import {
 } from '@/shared/ui/dialog';
 import { ImportBookmarkForm, importBookmarkSchema } from '@/entities/bookmark';
 import { useState } from 'react';
+import { useParams } from 'next/navigation';
 
 export function BookmarkModalImport() {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const utils = api.useUtils();
   const [open, setOpen] = useState(false);
   const form = useForm<ImportForm>({
@@ -61,7 +63,7 @@ export function BookmarkModalImport() {
         }
       });
 
-      create.mutate(importedBookmarks);
+      create.mutate({ bookmarks: importedBookmarks, organizationId });
     };
 
     await reader.readAsText(data.importFile);
