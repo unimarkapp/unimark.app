@@ -26,8 +26,6 @@ export function BookmarksGrid() {
     rootMargin: '0px',
   });
 
-  const { data: workspaces } = api.workspace.list.useQuery();
-
   const [data, bookmarkListQuery] = api.bookmark.list.useSuspenseInfiniteQuery(
     {
       query,

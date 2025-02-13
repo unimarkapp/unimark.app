@@ -9,8 +9,10 @@ import { ListItem } from './list-item';
 import { toast } from 'sonner';
 import { useIntersectionObserver } from '@uidotdev/usehooks';
 import { FetchingIndicator } from '@/shared/ui/fetching-indicator';
+import { useParams } from 'next/navigation';
 
 export function BookmarksTrashedList() {
+  const { organizationId } = useParams<{ organizationId: string }>();
   const utils = api.useUtils();
   const [searchParams] = useQueryStates({
     query: parseAsString,
@@ -28,6 +30,7 @@ export function BookmarksTrashedList() {
       query: searchParams.query,
       tags: searchParams.tags,
       deleted: true,
+      organizationId,
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
