@@ -1,1 +1,0 @@
-ALTER TABLE "organization" ADD COLUMN "default" boolean DEFAULT false;
