@@ -1,7 +1,7 @@
 import { getSession } from '@/shared/auth/sessions';
 import { api, HydrateClient } from '@/trpc/server';
 import { BookmarkGridSkeleton, BookmarksGrid } from '@/widgets/bookmark/bookmarks-grid';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -18,6 +18,12 @@ export default async function HomePage(props: { params: Params; searchParams: Se
   const searchParams = await props.searchParams;
   const query = searchParams.query ?? null;
   const tags = searchParams.tags ?? null;
+
+  const workspaces = await api.workspace.list();
+
+  if (workspaces.length === 0) return notFound();
+  if (workspaces.find((w) => w.id === organizationId) === undefined)
+    return redirect(`/${workspaces.find((w) => w.default)?.id}`);
 
   api.bookmark.list.prefetchInfinite({
     query: Array.isArray(query) ? query.join(',') : query,

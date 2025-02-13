@@ -2,13 +2,24 @@ import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
 import { TagsManager } from '@/features/tags/manager';
 import { getSession } from '@/shared/auth/sessions';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ThemeSwitcher } from '@/shared/ui/theme-switcher';
+import { api } from '@/trpc/server';
 
-export default async function Settings() {
+type Params = Promise<{ organizationId: string }>;
+
+export default async function Settings(props: { params: Params }) {
   const session = await getSession();
 
   if (!session) redirect('/login');
+
+  const { organizationId } = await props.params;
+
+  const workspaces = await api.workspace.list();
+
+  if (workspaces.length === 0) return notFound();
+  if (workspaces.find((w) => w.id === organizationId) === undefined)
+    return redirect(`/${workspaces.find((w) => w.default)?.id}`);
 
   return (
     <div className="">

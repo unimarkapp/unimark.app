@@ -8,6 +8,7 @@ export const worksapceRouter = {
       .select({
         id: organization.id,
         name: organization.name,
+        default: organization.default,
         role: member.role,
       })
       .from(member)
