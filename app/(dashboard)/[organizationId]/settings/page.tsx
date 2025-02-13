@@ -1,4 +1,3 @@
-import { Input } from '@/shared/ui/input';
 import { Separator } from '@/shared/ui/separator';
 import { TagsManager } from '@/features/tags/manager';
 import { getSession } from '@/shared/auth/sessions';
