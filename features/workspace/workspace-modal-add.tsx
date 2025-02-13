@@ -1,20 +1,17 @@
 'use client';
 
-import type { ChangeEvent } from 'react';
 import { Button } from '@/shared/ui/button';
 import { api } from '@/trpc/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/shared/ui/dialog';
 import { useState } from 'react';
-import { Loader2Icon, PlusIcon } from 'lucide-react';
 import { Textarea } from '@/shared/ui/textarea';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
@@ -53,9 +50,10 @@ export function WorkspaceModalAdd({ open, onCloseModal }: Props) {
         onRequest() {
           setIsSubmitting(true);
         },
-        onSuccess(context) {
+        async onSuccess(context) {
+          await utils.workspace.list.invalidate();
           onCloseModal();
-          setIsSubmitting(true);
+          setIsSubmitting(false);
           redirect(`/${context.data.id}`);
         },
         onError() {
