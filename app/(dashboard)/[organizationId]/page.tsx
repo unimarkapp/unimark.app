@@ -1,4 +1,5 @@
 import { getSession } from '@/shared/auth/sessions';
+import { SearchToolbar } from '@/shared/ui/search-toolbar';
 import { api, HydrateClient } from '@/trpc/server';
 import { BookmarkGridSkeleton, BookmarksGrid } from '@/widgets/bookmark/bookmarks-grid';
 import { notFound, redirect } from 'next/navigation';
@@ -33,6 +34,9 @@ export default async function HomePage(props: { params: Params; searchParams: Se
 
   return (
     <HydrateClient>
+      <div className="mb-4 max-w-xs">
+        <SearchToolbar />
+      </div>
       <Suspense fallback={<BookmarkGridSkeleton />}>
         <BookmarksGrid />
       </Suspense>

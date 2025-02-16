@@ -44,7 +44,7 @@ export function SearchToolbar({ className }: { className?: string }) {
           value={term}
           onChange={onChange}
           placeholder="Search..."
-          className="h-8 border-transparent bg-muted pl-8 shadow-none focus:bg-transparent lg:w-96"
+          className="h-8 border-transparent bg-muted pl-8 shadow-none focus:bg-transparent"
         />
         <SearchIcon className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
       </div>
